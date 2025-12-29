@@ -73,6 +73,7 @@ client.on("message", (channel, tags, message, self) => {
   }
 
   // Console log everything
+
   console.log(
     `[${username}] //// Messages: ${user.count} //// Avg Sentiment: ${avgScore} (${emotionLabel})`
   );

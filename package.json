@@ -1,0 +1,19 @@
+{
+  "name": "wmd-jonathanclaeys8",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "express": "^5.1.0",
+    "sentiment": "^5.0.2",
+    "tmi.js": "^1.8.5"
+  }
+}

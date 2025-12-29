@@ -1,6 +1,5 @@
-const tmi = require("tmi.js");
-const Sentiment = require("sentiment");
-const { app, PORT } = require("./api.js");
+import tmi from "tmi.js";
+import Sentiment from "sentiment";
 
 // Twitch Client Configuration
 const client = new tmi.Client({
@@ -18,11 +17,6 @@ function getEmotionLabel(score) {
   if (score < -1) return "negative";
   return "neutral";
 }
-
-// Start Express server
-app.listen(PORT, () => {
-  console.log(`Express server running on port ${PORT}`);
-});
 
 // Connect to Twitch Chat
 client.connect();

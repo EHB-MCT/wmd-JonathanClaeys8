@@ -10,7 +10,6 @@ app.get("/get", (req, res) => {
 });
 
 // Start server
-const PORT = 3000;
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(3000, "0.0.0.0", () => {
+  console.log("Server running on port 3000");
 });

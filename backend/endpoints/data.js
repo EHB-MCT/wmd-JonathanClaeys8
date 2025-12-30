@@ -4,24 +4,28 @@ const { getDb } = require('../mongo-connection');
 
 const router = express.Router();
 
-// GET /data - Get all data
+// GET /data - Get all chat messages
 router.get('/', async (req, res) => {
   try {
     const db = getDb();
-    const data = await db.collection('example').find({}).toArray();
+    const data = await db.collection('chatmessages')
+      .find({})
+      .sort({ timestamp: -1 })
+      .limit(100)
+      .toArray();
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /data/:id - Get data by ID
+// GET /data/:id - Get message by ID
 router.get('/:id', async (req, res) => {
   try {
     const db = getDb();
-    const item = await db.collection('example').findOne({ _id: new ObjectId(req.params.id) });
+    const item = await db.collection('chatmessages').findOne({ _id: new ObjectId(req.params.id) });
     if (!item) {
-      return res.status(404).json({ success: false, error: 'Data not found' });
+      return res.status(404).json({ success: false, error: 'Message not found' });
     }
     res.json({ success: true, data: item });
   } catch (error) {
@@ -29,15 +33,18 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /data - Add new data
+// POST /data - Add new chat message
 router.post('/', async (req, res) => {
   try {
     const db = getDb();
-    const newData = { ...req.body, createdAt: new Date() };
-    const result = await db.collection('example').insertOne(newData);
+    const newMessage = { 
+      ...req.body, 
+      timestamp: new Date()
+    };
+    const result = await db.collection('chatmessages').insertOne(newMessage);
     res.status(201).json({ 
       success: true, 
-      message: 'Data added successfully', 
+      message: 'Message added successfully', 
       id: result.insertedId 
     });
   } catch (error) {
@@ -45,37 +52,37 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /data/:id - Update data
+// PUT /data/:id - Update chat message
 router.put('/:id', async (req, res) => {
   try {
     const db = getDb();
     const updateData = { ...req.body, updatedAt: new Date() };
-    const result = await db.collection('example').updateOne(
+    const result = await db.collection('chatmessages').updateOne(
       { _id: new ObjectId(req.params.id) },
       { $set: updateData }
     );
     
     if (result.matchedCount === 0) {
-      return res.status(404).json({ success: false, error: 'Data not found' });
+      return res.status(404).json({ success: false, error: 'Message not found' });
     }
     
-    res.json({ success: true, message: 'Data updated successfully' });
+    res.json({ success: true, message: 'Message updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// DELETE /data/:id - Delete data by ID
+// DELETE /data/:id - Delete message by ID
 router.delete('/:id', async (req, res) => {
   try {
     const db = getDb();
-    const result = await db.collection('example').deleteOne({ _id: new ObjectId(req.params.id) });
+    const result = await db.collection('chatmessages').deleteOne({ _id: new ObjectId(req.params.id) });
     
     if (result.deletedCount === 0) {
-      return res.status(404).json({ success: false, error: 'Data not found' });
+      return res.status(404).json({ success: false, error: 'Message not found' });
     }
     
-    res.json({ success: true, message: 'Data deleted successfully' });
+    res.json({ success: true, message: 'Message deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

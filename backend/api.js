@@ -1,9 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 const { connectToMongo } = require('./mongo-connection');
 const usersRouter = require('./endpoints/users');
 const dataRouter = require('./endpoints/data');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Health check endpoint

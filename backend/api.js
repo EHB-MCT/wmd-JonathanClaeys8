@@ -1,27 +1,21 @@
 const express = require("express");
-const { connectToMongo, getDb } = require('./mongo-connection');
+const { connectToMongo } = require('./mongo-connection');
+const usersRouter = require('./endpoints/users');
+const dataRouter = require('./endpoints/data');
 
 const app = express();
 app.use(express.json());
 
-// Basic route
+// Health check endpoint
 app.get("/get", (req, res) => {
   res.json({
     message: "API is working with MongoDB",
   });
 });
 
-// MongoDB example route
-app.get("/data", async (req, res) => {
-  try {
-    const db = getDb();
-    const collection = db.collection('example');
-    const data = await collection.find({}).toArray();
-    res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+// Use modular endpoints
+app.use('/users', usersRouter);
+app.use('/data', dataRouter);
 
 // Start server with MongoDB connection
 async function startServer() {

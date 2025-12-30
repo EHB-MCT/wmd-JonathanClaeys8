@@ -13,6 +13,7 @@
   "dependencies": {
     "chart.js": "^4.5.1",
     "express": "^5.1.0",
+    "mongodb": "^6.10.0",
     "nodemon": "^3.1.11",
     "sentiment": "^5.0.2",
     "tmi.js": "^1.8.5"

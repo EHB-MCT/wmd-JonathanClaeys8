@@ -1,0 +1,28 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: wmd-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - wmd-network
+
+  backend:
+    build: ./backend
+    container_name: wmd-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/wmd_database
+    depends_on:
+      - mongo
+    networks:
+      - wmd-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  wmd-network:

@@ -4,3 +4,5 @@ node_modules
 README.md
 Dockerfile
 .dockerignore
+src/css/*.map
+src/js/*.map

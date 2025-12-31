@@ -18,6 +18,7 @@ services:
       - MONGODB_URI=mongodb://mongo:27017/wmd_database
       - TWITCH_USERNAME=justinfan12345
       - TWITCH_OAUTH=oauth:1234567890abcdef
+      - TWITCH_CHANNELS=Poofplay,Shroud
     depends_on:
       - mongo
     networks:

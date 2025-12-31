@@ -3,6 +3,7 @@ const cors = require("cors");
 const { connectToMongo } = require('./mongo-connection');
 const usersRouter = require('./endpoints/users');
 const dataRouter = require('./endpoints/data');
+const channelsRouter = require('./endpoints/channels');
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.get("/get", (req, res) => {
 // Use modular endpoints
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
+app.use('/channels', channelsRouter);
 
 // Start server with MongoDB connection
 async function startServer() {

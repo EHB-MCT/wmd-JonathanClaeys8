@@ -1,6 +1,6 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
-const { getDb } = require('../mongo-connection');
+const { getDb } = require("../mongo-connection");
 
 const router = express.Router();
 

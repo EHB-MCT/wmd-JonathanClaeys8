@@ -1,6 +1,6 @@
 const tmi = require("tmi.js");
 const Sentiment = require("sentiment");
-const { connectToMongo, getDb } = require('./mongo-connection');
+const { connectToMongo, getDb } = require('./src/mongo-connection');
 
 let currentClient = null;
 let currentChannels = [];

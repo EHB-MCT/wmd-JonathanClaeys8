@@ -1,9 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const { connectToMongo } = require('./mongo-connection');
-const usersRouter = require('./endpoints/users');
-const dataRouter = require('./endpoints/data');
-const channelsRouter = require('./endpoints/channels');
+const { connectToMongo } = require('./src/mongo-connection');
+const { usersRouter, dataRouter, channelsRouter } = require('./src/endpoints');
 
 const app = express();
 app.use(cors());

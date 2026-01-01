@@ -199,6 +199,57 @@ async function fetchMessages() {
     }
 }
 
+// Calculate average sentiment scores for all users
+function calculateUserAverages(messages) {
+    if (!messages || messages.length === 0) {
+        return {};
+    }
+    
+    const userScores = {};
+    
+    messages.forEach(msg => {
+        const username = msg.username || 'Unknown';
+        const score = msg.sentimentScore || 0;
+        
+        if (!userScores[username]) {
+            userScores[username] = { total: 0, count: 0 };
+        }
+        
+        userScores[username].total += score;
+        userScores[username].count += 1;
+    });
+    
+    // Calculate averages
+    const averages = {};
+    for (const username in userScores) {
+        averages[username] = userScores[username].total / userScores[username].count;
+    }
+    
+    return averages;
+}
+
+// Get score class and display value based on average score
+function getScoreDisplay(avgScore) {
+    const roundedScore = Math.round(avgScore * 10) / 10;
+    
+    if (roundedScore > 0.5) {
+        return {
+            class: 'positive',
+            display: `+${roundedScore.toFixed(1)}`
+        };
+    } else if (roundedScore < -0.5) {
+        return {
+            class: 'negative',
+            display: roundedScore.toFixed(1)
+        };
+    } else {
+        return {
+            class: 'neutral',
+            display: roundedScore.toFixed(1)
+        };
+    }
+}
+
 // Display messages in the container
 function displayMessages(messages) {
     if (!messagesContainer) return;
@@ -207,17 +258,26 @@ function displayMessages(messages) {
         messagesContainer.innerHTML = '<div class="loading">No messages found</div>';
         return;
     }
+    
+    // Calculate user averages
+    const userAverages = calculateUserAverages(messages);
 
     const messagesHTML = messages.map(msg => {
         const sentiment = msg.sentiment || 'neutral';
         const sentimentClass = `sentiment-${sentiment}`;
         const time = new Date(msg.timestamp || msg.createdAt).toLocaleTimeString();
         const channelName = msg.channel || 'unknown';
+        const username = msg.username || 'Unknown';
+        
+        // Get user's average score
+        const userAvgScore = userAverages[username] || 0;
+        const scoreDisplay = getScoreDisplay(userAvgScore);
         
         return `
             <div class="message-row ${sentimentClass}">
                 <div class="message-channel">${channelName}</div>
-                <div class="message-username">${msg.username || 'Unknown'}</div>
+                <div class="message-username">${username}</div>
+                <div class="user-score ${scoreDisplay.class}">${scoreDisplay.display}</div>
                 <div class="message-content">${msg.message || 'No message content'}</div>
                 <div class="message-time">${time}</div>
             </div>

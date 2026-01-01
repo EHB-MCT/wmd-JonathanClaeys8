@@ -3,7 +3,7 @@ const API_BASE_URL = 'http://localhost/api/data';
 const CHANNELS_API_URL = 'http://localhost/api/channels';
 
 // DOM Elements
-let channelsList, messagesContainer, channelInput, addButton, feedback;
+let channelsList, messagesContainer, channelInput, addButton, feedback, suspiciousUsersContainer;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,6 +18,7 @@ function initializeElements() {
     channelInput = document.getElementById('channel-input');
     addButton = document.getElementById('add-button');
     feedback = document.getElementById('add-channel-feedback');
+    suspiciousUsersContainer = document.getElementById('suspicious-users');
 }
 
 function setupEventListeners() {
@@ -191,6 +192,7 @@ async function fetchMessages() {
         
         if (data.success && data.data) {
             displayMessages(data.data);
+            displaySuspiciousUsers(data.data);
         } else {
             showError('Failed to load messages: Invalid response format');
         }
@@ -285,6 +287,52 @@ function displayMessages(messages) {
     }).join('');
 
     messagesContainer.innerHTML = messagesHTML;
+}
+
+// Display users with negative average sentiment scores
+function displaySuspiciousUsers(messages) {
+    console.log('displaySuspiciousUsers called with messages:', messages?.length);
+    if (!suspiciousUsersContainer) {
+        console.error('suspiciousUsersContainer not found!');
+        return;
+    }
+    
+    if (!messages || messages.length === 0) {
+        suspiciousUsersContainer.innerHTML = '<h3>Suspicious Users</h3><p>No user data available</p>';
+        return;
+    }
+    
+    const userAverages = calculateUserAverages(messages);
+    console.log('User averages:', userAverages);
+    
+    // Filter users with negative average scores
+    const negativeUsers = Object.entries(userAverages)
+        .filter(([username, avgScore]) => avgScore < 0)
+        .sort((a, b) => a[1] - b[1]); // Sort by most negative first
+    
+    console.log('Negative users:', negativeUsers);
+    
+    if (negativeUsers.length === 0) {
+        suspiciousUsersContainer.innerHTML = '<h3>Suspicious Users</h3><p>No users with negative sentiment detected</p>';
+        return;
+    }
+    
+    const usersHTML = negativeUsers.map(([username, avgScore]) => {
+        const scoreDisplay = getScoreDisplay(avgScore);
+        return `
+            <div class="suspicious-user-item">
+                <span class="suspicious-username">${username}</span>
+                <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
+            </div>
+        `;
+    }).join('');
+    
+    suspiciousUsersContainer.innerHTML = `
+        <h3>Suspicious Users (${negativeUsers.length})</h3>
+        <div class="suspicious-users-list">
+            ${usersHTML}
+        </div>
+    `;
 }
 
 // Show error message

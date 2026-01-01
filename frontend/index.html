@@ -1,42 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multi-Channel Chat Moderation</title>
-    <link rel="stylesheet" href="src/css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="src/css/styles.css" />
+  </head>
+  <body>
     <div class="header">
-        <h1>Multi-Channel Chat Moderation</h1>
-    </div>
+      <div class="channel-info">
+        <!-- Add Channel Form -->
+        <div class="add-channel-form">
+          <h3>Add a new channel to track</h3>
+          <div class="form-row">
+            <input
+              type="text"
+              id="channel-input"
+              placeholder="Enter channel name"
+              maxlength="50"
+            />
+            <button onclick="addChannel()" id="add-button">Add Channel</button>
+          </div>
+          <div id="add-channel-feedback"></div>
+        </div>
 
-    <div class="channel-info">
-        <h2>Tracked Channels</h2>
-        
         <!-- Channels List -->
         <div class="channels-container">
-            <div id="channels-list">Loading channels...</div>
-            
-            <!-- Add Channel Form -->
-            <div class="add-channel-form">
-                <h3>Add New Channel</h3>
-                <div class="form-row">
-                    <input type="text" id="channel-input" placeholder="Enter channel name (e.g., ninja, xQc)" maxlength="50">
-                    <button onclick="addChannel()" id="add-button">Add Channel</button>
-                </div>
-                <div id="add-channel-feedback"></div>
-            </div>
+          <div id="channels-list">Loading channels...</div>
         </div>
-        
-        <p>Multi-channel chat moderation interface</p>
+      </div>
+      <!-- Suspicious Users Section -->
+      <div class="suspicious-users">
+        <h3>Suspicious Users</h3>
+      </div>
     </div>
 
-    <div id="error-container"></div>
+    <h3 id="messages-title" class="messages-title">Logs from all channels</h3>
     <div id="messages-container" class="messages-container">
-        <div class="loading">Loading messages...</div>
+      <div class="loading">Loading messages...</div>
     </div>
 
     <script src="src/js/app.js"></script>
-</body>
+  </body>
 </html>

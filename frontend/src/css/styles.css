@@ -495,6 +495,126 @@ body {
   text-align: right;
 }
 
+/* Registration and Viewer Pages */
+.register-container, .viewer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1e1e1e;
+}
+
+.register-form, .viewer-content {
+  background-color: #2d2d2d;
+  padding: 40px;
+  border-radius: 12px;
+  border-left: 4px solid #6441a5;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-form h1, .viewer-content h1 {
+  color: #6441a5;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.viewer-content {
+  text-align: center;
+}
+
+.viewer-info {
+  margin-top: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #ffffff;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1e1e1e;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: #6441a5;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #6441a5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.register-btn:hover {
+  background-color: #7a3dbe;
+}
+
+.register-btn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.logout-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  margin-top: 15px;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+.feedback-success {
+  color: #4caf50;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.feedback-error {
+  color: #f44336;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.moderator-info {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
 .sentiment-positive {
   border-left: 4px solid #4caf50;
 }

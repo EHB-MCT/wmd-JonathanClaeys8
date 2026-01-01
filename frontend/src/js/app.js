@@ -12,6 +12,10 @@ let channelsList,
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function () {
+  // Check moderator access first
+  const user = checkModeratorAccess();
+  if (!user) return; // Will redirect if not authorized
+  
   initializeElements();
   setupEventListeners();
   init();

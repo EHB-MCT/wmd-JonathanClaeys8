@@ -313,8 +313,10 @@ function displayMessages(messages) {
 
       return `
             <div class="message-row ${sentimentClass}">
-                <div class="message-channel">${channelName}</div>
-                <div class="message-username">${username}</div>
+                <div class="message-user-info">
+                    <div class="message-channel">${channelName}</div>
+                    <div class="message-username">${username}</div>
+                </div>
                 <div class="user-score ${scoreDisplay.class}">${
         scoreDisplay.display
       }</div>

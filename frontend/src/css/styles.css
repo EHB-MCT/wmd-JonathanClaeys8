@@ -247,7 +247,7 @@ body {
   padding: 8px;
   display: none;
   z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .user-dropdown.show {

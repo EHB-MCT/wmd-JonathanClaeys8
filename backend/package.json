@@ -12,10 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^6.10.0",
     "nodemon": "^3.1.11",
     "sentiment": "^5.0.2",

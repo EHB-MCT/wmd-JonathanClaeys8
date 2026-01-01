@@ -1,53 +1,46 @@
-// Registration form handler
-async function handleRegistration(event) {
+// Login form handler
+async function handleLogin(event) {
     event.preventDefault();
     
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
-    const feedback = document.getElementById('register-feedback');
-    const registerButton = document.getElementById('register-button');
+    const feedback = document.getElementById('login-feedback');
+    const loginButton = document.getElementById('login-button');
     
     // Validate inputs
-    if (!username || !password || !role) {
+    if (!username || !password) {
         showFeedback('Please fill in all fields', 'error');
         return;
     }
     
-    if (password.length < 6) {
-        showFeedback('Password must be at least 6 characters', 'error');
-        return;
-    }
-    
     // Disable button and show loading
-    registerButton.disabled = true;
-    registerButton.textContent = 'Registering...';
+    loginButton.disabled = true;
+    loginButton.textContent = 'Logging in...';
     feedback.innerHTML = '';
     
     try {
-        const response = await fetch('http://localhost:3000/auth/register', {
+        const response = await fetch('http://localhost:3000/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 username,
-                password,
-                role
+                password
             })
         });
         
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Registration failed');
+            throw new Error(data.error || 'Login failed');
         }
         
         // Store user data and token in localStorage
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userData', JSON.stringify(data.user));
         
-        showFeedback('Registration successful! Redirecting...', 'success');
+        showFeedback('Login successful! Redirecting...', 'success');
         
         // Redirect based on role
         setTimeout(() => {
@@ -59,15 +52,15 @@ async function handleRegistration(event) {
         }, 1500);
         
     } catch (error) {
-        console.error('Registration error:', error);
-        showFeedback(error.message || 'Registration failed', 'error');
-        registerButton.disabled = false;
-        registerButton.textContent = 'Register';
+        console.error('Login error:', error);
+        showFeedback(error.message || 'Login failed', 'error');
+        loginButton.disabled = false;
+        loginButton.textContent = 'Login';
     }
 }
 
 function showFeedback(message, type) {
-    const feedback = document.getElementById('register-feedback');
+    const feedback = document.getElementById('login-feedback');
     feedback.innerHTML = `<div class="feedback-${type}">${message}</div>`;
     
     // Clear feedback after 5 seconds
@@ -77,4 +70,4 @@ function showFeedback(message, type) {
 }
 
 // Export for global access
-window.handleRegistration = handleRegistration;
+window.handleLogin = handleLogin;

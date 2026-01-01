@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { connectToMongo } = require('./src/mongo-connection');
-const { usersRouter, dataRouter, channelsRouter } = require('./src/endpoints');
+const { usersRouter, dataRouter, channelsRouter, authRouter } = require('./src/endpoints');
 
 const app = express();
 app.use(cors());
@@ -15,6 +15,7 @@ app.get("/get", (req, res) => {
 });
 
 // Use modular endpoints
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
 app.use('/channels', channelsRouter);

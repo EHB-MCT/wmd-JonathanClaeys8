@@ -527,6 +527,18 @@ body {
 
 .viewer-info {
   margin-top: 30px;
+  text-align: center;
+}
+
+.viewer-info .user-email {
+  background-color: #2d2d2d;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #ffffff;
+  border: 1px solid #6441a5;
+  margin-bottom: 15px;
+  display: inline-block;
 }
 
 .form-group {
@@ -613,6 +625,19 @@ body {
   top: 20px;
   right: 20px;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.user-email {
+  background-color: #2d2d2d;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #ffffff;
+  border: 1px solid #6441a5;
 }
 
 .sentiment-positive {

@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const user = checkModeratorAccess();
   if (!user) return; // Will redirect if not authorized
   
+  // Display user email
+  displayUserInfo();
+  
   initializeElements();
   setupEventListeners();
   init();

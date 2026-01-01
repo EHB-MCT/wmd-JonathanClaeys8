@@ -275,12 +275,18 @@ function displayMessages(messages) {
         const userAvgScore = userAverages[username] || 0;
         const scoreDisplay = getScoreDisplay(userAvgScore);
         
+        // Get individual message sentiment score
+        const messageScore = msg.sentimentScore || 0;
+        const messageScoreDisplay = messageScore > 0 ? `+${messageScore}` : messageScore.toString();
+        const messageScoreClass = messageScore > 0 ? 'positive' : messageScore < 0 ? 'negative' : 'neutral';
+        
         return `
             <div class="message-row ${sentimentClass}">
                 <div class="message-channel">${channelName}</div>
                 <div class="message-username">${username}</div>
                 <div class="user-score ${scoreDisplay.class}">${scoreDisplay.display}</div>
                 <div class="message-content">${msg.message || 'No message content'}</div>
+                <div class="message-score ${messageScoreClass}">${messageScoreDisplay}</div>
                 <div class="message-time">${time}</div>
             </div>
         `;

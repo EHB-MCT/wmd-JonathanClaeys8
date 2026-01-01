@@ -183,6 +183,20 @@ body {
   font-size: 14px;
 }
 
+.suspicious-stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.suspicious-count {
+  font-size: 0.8rem;
+  color: #888888;
+  background-color: #1e1e1e;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 .suspicious-score {
   font-weight: bold;
   font-size: 0.8rem;

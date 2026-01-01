@@ -303,7 +303,16 @@ function displaySuspiciousUsers(messages) {
     }
     
     const userAverages = calculateUserAverages(messages);
+    
+    // Calculate total message counts for each user
+    const userMessageCounts = {};
+    messages.forEach(msg => {
+        const username = msg.username || 'Unknown';
+        userMessageCounts[username] = (userMessageCounts[username] || 0) + 1;
+    });
+    
     console.log('User averages:', userAverages);
+    console.log('User message counts:', userMessageCounts);
     
     // Filter users with negative average scores
     const negativeUsers = Object.entries(userAverages)
@@ -319,10 +328,14 @@ function displaySuspiciousUsers(messages) {
     
     const usersHTML = negativeUsers.map(([username, avgScore]) => {
         const scoreDisplay = getScoreDisplay(avgScore);
+        const messageCount = userMessageCounts[username] || 0;
         return `
             <div class="suspicious-user-item">
                 <span class="suspicious-username">${username}</span>
-                <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
+                <span class="suspicious-stats">
+                    <span class="suspicious-count">${messageCount} msgs</span>
+                    <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
+                </span>
             </div>
         `;
     }).join('');

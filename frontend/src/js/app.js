@@ -336,12 +336,17 @@ function displaySuspiciousUsers(messages) {
         const scoreDisplay = getScoreDisplay(avgScore);
         const messageCount = userMessageCounts[username] || 0;
         return `
-            <div class="suspicious-user-item">
+            <div class="suspicious-user-item" onclick="toggleUserDropdown('${username}')">
                 <span class="suspicious-username">${username}</span>
                 <span class="suspicious-stats">
                     <span class="suspicious-count">${messageCount} msgs</span>
                     <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
                 </span>
+                <div class="user-dropdown" id="dropdown-${username}">
+                    <button class="dropdown-btn ban-btn" onclick="event.stopPropagation(); banUser('${username}')">Ban</button>
+                    <button class="dropdown-btn timeout-btn" onclick="event.stopPropagation(); timeoutUser('${username}')">Time-out</button>
+                    <button class="dropdown-btn warning-btn" onclick="event.stopPropagation(); warnUser('${username}')">Warning</button>
+                </div>
             </div>
         `;
     }).join('');
@@ -362,6 +367,47 @@ function showError(message) {
     }
 }
 
+// Toggle user dropdown menu
+function toggleUserDropdown(username) {
+    const dropdown = document.getElementById(`dropdown-${username}`);
+    
+    // Close all other dropdowns
+    document.querySelectorAll('.user-dropdown').forEach(dd => {
+        if (dd !== dropdown) {
+            dd.classList.remove('show');
+        }
+    });
+    
+    // Toggle current dropdown
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.suspicious-user-item')) {
+        document.querySelectorAll('.user-dropdown').forEach(dd => {
+            dd.classList.remove('show');
+        });
+    }
+});
+
+// Placeholder functions for moderation actions
+function banUser(username) {
+    alert(`Ban user: ${username}`);
+}
+
+function timeoutUser(username) {
+    alert(`Time-out user: ${username}`);
+}
+
+function warnUser(username) {
+    alert(`Send warning to: ${username}`);
+}
+
 // Export functions for global access (needed for onclick handlers)
 window.addChannel = addChannel;
 window.deleteChannel = deleteChannel;
+window.toggleUserDropdown = toggleUserDropdown;
+window.banUser = banUser;
+window.timeoutUser = timeoutUser;
+window.warnUser = warnUser;

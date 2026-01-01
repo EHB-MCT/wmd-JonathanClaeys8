@@ -335,6 +335,27 @@ function displaySuspiciousUsers(messages) {
     const usersHTML = negativeUsers.map(([username, avgScore]) => {
         const scoreDisplay = getScoreDisplay(avgScore);
         const messageCount = userMessageCounts[username] || 0;
+        
+        // Get only negative messages for this user
+        const userNegativeMessages = messages.filter(msg => 
+            msg.username === username && (msg.sentimentScore || 0) < 0
+        );
+        
+        const negativeMessagesHTML = userNegativeMessages.map(msg => {
+            const time = new Date(msg.timestamp || msg.createdAt).toLocaleTimeString();
+            const score = msg.sentimentScore || 0;
+            const scoreDisplay = score > 0 ? `+${score}` : score.toString();
+            const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral';
+            
+            return `
+                <div class="negative-message-item">
+                    <div class="negative-message-content">${msg.message || 'No message content'}</div>
+                    <div class="negative-message-score score-${scoreClass}">${scoreDisplay}</div>
+                    <div class="negative-message-time">${time}</div>
+                </div>
+            `;
+        }).join('');
+        
         return `
             <div class="suspicious-user-item" onclick="toggleUserDropdown('${username}')">
                 <span class="suspicious-username">${username}</span>
@@ -343,9 +364,15 @@ function displaySuspiciousUsers(messages) {
                     <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
                 </span>
                 <div class="user-dropdown" id="dropdown-${username}">
-                    <button class="dropdown-btn ban-btn" onclick="event.stopPropagation(); banUser('${username}')">Ban</button>
-                    <button class="dropdown-btn timeout-btn" onclick="event.stopPropagation(); timeoutUser('${username}')">Time-out</button>
-                    <button class="dropdown-btn warning-btn" onclick="event.stopPropagation(); warnUser('${username}')">Warning</button>
+                    <div class="negative-messages">
+                        <h4>Negative Messages</h4>
+                        ${negativeMessagesHTML}
+                    </div>
+                    <div class="dropdown-buttons">
+                        <button class="dropdown-btn ban-btn" onclick="event.stopPropagation(); banUser('${username}')">Ban</button>
+                        <button class="dropdown-btn timeout-btn" onclick="event.stopPropagation(); timeoutUser('${username}')">Time-out</button>
+                        <button class="dropdown-btn warning-btn" onclick="event.stopPropagation(); warnUser('${username}')">Warning</button>
+                    </div>
                 </div>
             </div>
         `;

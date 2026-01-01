@@ -251,8 +251,7 @@ body {
 }
 
 .user-dropdown.show {
-  display: flex;
-  gap: 8px;
+  display: block;
   width: 100%;
   margin-top: 5px;
 }
@@ -294,6 +293,76 @@ body {
 
 .warning-btn:hover {
   background-color: #1976d2;
+}
+
+.negative-messages {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.negative-messages h4 {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
+  font-weight: bold;
+}
+
+.negative-message-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  gap: 8px;
+  border-bottom: 1px solid #333;
+}
+
+.negative-message-item:last-child {
+  border-bottom: none;
+}
+
+.negative-message-content {
+  flex: 1;
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+.negative-message-score {
+  font-weight: bold;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 3px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.score-negative {
+  background-color: #f44336;
+  color: white;
+}
+
+.score-positive {
+  background-color: #4caf50;
+  color: white;
+}
+
+.score-neutral {
+  background-color: #888888;
+  color: white;
+}
+
+.negative-message-time {
+  font-size: 0.7rem;
+  color: #888888;
+  min-width: 45px;
+  text-align: right;
+}
+
+.dropdown-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
 }
 
 .suspicious-user-item {

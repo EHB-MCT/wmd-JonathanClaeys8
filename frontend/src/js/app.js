@@ -300,6 +300,9 @@ function displayMessages(messages) {
           : messageScore < 0
           ? "negative"
           : "neutral";
+      
+      // Get message date
+      const date = new Date(msg.timestamp || msg.createdAt).toLocaleDateString();
 
       return `
             <div class="message-row ${sentimentClass}">
@@ -312,6 +315,7 @@ function displayMessages(messages) {
                   msg.message || "No message content"
                 }</div>
                 <div class="message-score ${messageScoreClass}">${messageScoreDisplay}</div>
+                <div class="message-date">${date}</div>
                 <div class="message-time">${time}</div>
             </div>
         `;

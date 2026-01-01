@@ -480,6 +480,14 @@ body {
   color: white;
 }
 
+.message-date {
+  color: #888888;
+  font-size: 0.8rem;
+  min-width: 70px;
+  text-align: right;
+  margin-right: 10px;
+}
+
 .message-time {
   color: #888888;
   font-size: 0.9rem;

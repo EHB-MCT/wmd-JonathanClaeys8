@@ -22,6 +22,30 @@
       </div>
     </nav>
     
+    <!-- Analytics Dashboard -->
+    <div class="charts-container">
+      <div class="chart-row">
+        <div class="chart-container">
+          <h3>Sentiment Distribution</h3>
+          <canvas id="sentimentChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>Channel Activity Over Time</h3>
+          <canvas id="channelActivityChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-container">
+          <h3>Users Tracked vs Average Score</h3>
+          <canvas id="usersScoreChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>Top Users Leaderboard</h3>
+          <canvas id="leaderboardChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
     <div class="header">
       <div class="channel-info">
         <!-- Add Channel Form -->
@@ -58,6 +82,8 @@
       <div class="loading">Loading messages...</div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="src/js/charts.js?v=1.0"></script>
     <script src="src/js/auth.js?v=2.2"></script>
     <script src="src/js/app.js?v=2.2"></script>
   </body>

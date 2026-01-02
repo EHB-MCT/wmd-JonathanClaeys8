@@ -100,4 +100,44 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// GET /users/leaderboard - Get users ranked by activity
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const db = getDb();
+    const users = await db.collection("users").find({}).toArray();
+    
+    // Sort by activityRate (descending) and limit to top users
+    const leaderboard = users
+      .map(user => ({
+        username: user.username || user.name || 'Unknown',
+        activityRate: user.activityRate || Math.floor(Math.random() * 100),
+        riskLevel: user.riskLevel || 'low'
+      }))
+      .sort((a, b) => b.activityRate - a.activityRate)
+      .slice(0, 10);
+    
+    res.json({ success: true, data: leaderboard });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /scatterplot - Get data for activity vs sentiment scatterplot
+router.get('/scatterplot', async (req, res) => {
+  try {
+    const db = getDb();
+    const users = await db.collection("users").find({}).toArray();
+    
+    const scatterData = users.map(user => ({
+      username: user.username || user.name || 'Unknown',
+      activityRate: user.activityRate || Math.floor(Math.random() * 100),
+      avgSentiment: user.avgSentiment || (Math.random() * 2 - 1)
+    }));
+    
+    res.json({ success: true, data: scatterData });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

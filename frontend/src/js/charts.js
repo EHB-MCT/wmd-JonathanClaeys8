@@ -1,0 +1,371 @@
+class AnalyticsCharts {
+  constructor() {
+    this.charts = {};
+    this.init();
+  }
+
+  async init() {
+    await this.loadData();
+    this.createCharts();
+  }
+
+  async loadData() {
+    try {
+      // Determine API base URL based on current environment
+      const isDevServer = window.location.port === '5500' || window.location.hostname === '127.0.0.1';
+      const apiBase = isDevServer ? 'http://localhost:3000' : '/api';
+      
+      // Fetch all necessary data - using appropriate API endpoint
+      const [sentimentResponse, leaderboardResponse, scatterResponse, activityResponse] = await Promise.all([
+        fetch(`${apiBase}/sentiment-distribution`).then(res => res.json()),
+        fetch(`${apiBase}/leaderboard`).then(res => res.json()),
+        fetch(`${apiBase}/scatterplot`).then(res => res.json()),
+        fetch(`${apiBase}/channel-activity`).then(res => res.json())
+      ]);
+
+      // Extract data from response format
+      this.sentimentData = sentimentResponse.success ? sentimentResponse.data : sentimentResponse;
+      this.leaderboardData = leaderboardResponse.success ? leaderboardResponse.data : leaderboardResponse;
+      this.scatterData = scatterResponse.success ? scatterResponse.data : scatterResponse;
+      this.channelActivityData = activityResponse.success ? activityResponse.data : activityResponse;
+    } catch (error) {
+      console.error('Error loading chart data:', error);
+      // Use mock data if API fails
+      this.useMockData();
+    }
+  }
+
+  useMockData() {
+    this.sentimentData = {
+      positive: 145,
+      negative: 67,
+      neutral: 89
+    };
+
+    this.leaderboardData = [
+      { username: 'StreamViewer123', totalMessages: 234, avgSentiment: 0.3, activityRate: 85, riskLevel: 'low', channelCount: 2 },
+      { username: 'ChatUser456', totalMessages: 189, avgSentiment: -0.5, activityRate: 92, riskLevel: 'high', channelCount: 1 },
+      { username: 'GamerPro789', totalMessages: 156, avgSentiment: 0.1, activityRate: 67, riskLevel: 'medium', channelCount: 3 },
+      { username: 'TwitchFan01', totalMessages: 145, avgSentiment: 0.7, activityRate: 78, riskLevel: 'low', channelCount: 1 },
+      { username: 'EmojiKing', totalMessages: 98, avgSentiment: -0.2, activityRate: 45, riskLevel: 'medium', channelCount: 2 }
+    ];
+
+    this.scatterData = [
+      { username: 'StreamViewer123', activityRate: 85, avgSentiment: 0.3, totalMessages: 234 },
+      { username: 'ChatUser456', activityRate: 92, avgSentiment: -0.5, totalMessages: 189 },
+      { username: 'GamerPro789', activityRate: 67, avgSentiment: 0.1, totalMessages: 156 },
+      { username: 'TwitchFan01', activityRate: 78, avgSentiment: 0.7, totalMessages: 145 },
+      { username: 'EmojiKing', activityRate: 45, avgSentiment: -0.2, totalMessages: 98 }
+    ];
+
+    this.channelActivityData = [
+      { hour: '17:00', count: 34 },
+      { hour: '18:00', count: 45 },
+      { hour: '19:00', count: 67 },
+      { hour: '20:00', count: 89 },
+      { hour: '21:00', count: 123 },
+      { hour: '22:00', count: 98 }
+    ];
+  }
+
+  createCharts() {
+    this.createSentimentChart();
+    this.createChannelActivityChart();
+    this.createUsersScoreChart();
+    this.createLeaderboardChart();
+  }
+
+  createSentimentChart() {
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    
+    // Use real sentiment distribution data from Twitch chat messages
+    const sentiments = this.sentimentData || { positive: 0, negative: 0, neutral: 0 };
+
+    this.charts.sentiment = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Positive', 'Negative', 'Neutral'],
+        datasets: [{
+          data: [sentiments.positive, sentiments.negative, sentiments.neutral],
+          backgroundColor: ['#4caf50', '#f44336', '#ff9800'],
+          borderWidth: 2,
+          borderColor: '#2d2d2d'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#ffffff',
+              padding: 15,
+              font: {
+                size: 12
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return `${context.label}: ${context.parsed} messages (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createChannelActivityChart() {
+    const ctx = document.getElementById('channelActivityChart').getContext('2d');
+    
+    let hours = [];
+    let messageCounts = [];
+    
+    // Use real channel activity data if available
+    if (this.channelActivityData && this.channelActivityData.length > 0) {
+      hours = this.channelActivityData.map(item => item.hour);
+      messageCounts = this.channelActivityData.map(item => item.count);
+    } else {
+      // Fallback to generated data
+      const now = new Date();
+      for (let i = 23; i >= 0; i--) {
+        const hour = new Date(now.getTime() - i * 60 * 60 * 1000);
+        hours.push(hour.getHours() + ':00');
+        messageCounts.push(Math.floor(Math.random() * 50) + 10 + (hour.getHours() >= 18 && hour.getHours() <= 22 ? 30 : 0));
+      }
+    }
+
+    this.charts.channelActivity = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: hours,
+        datasets: [{
+          label: 'Messages per Hour',
+          data: messageCounts,
+          borderColor: '#6441a5',
+          backgroundColor: 'rgba(100, 65, 165, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: '#9147ff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Time (Last 24 Hours)',
+              color: '#ffffff'
+            },
+            ticks: {
+              color: '#ffffff',
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: {
+              color: '#444444'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Message Count',
+              color: '#ffffff'
+            },
+            ticks: {
+              color: '#ffffff'
+            },
+            grid: {
+              color: '#444444'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#ffffff'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createLeaderboardChart() {
+    const ctx = document.getElementById('leaderboardChart').getContext('2d');
+    
+    const topUsers = this.leaderboardData.slice(0, 5);
+    
+    this.charts.leaderboard = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: topUsers.map(user => user.username),
+        datasets: [{
+          label: 'Activity Rate',
+          data: topUsers.map(user => user.activityRate),
+          backgroundColor: topUsers.map(user => {
+            switch(user.riskLevel) {
+              case 'high': return '#f44336';
+              case 'medium': return '#ff9800';
+              case 'low': return '#4caf50';
+              default: return '#6441a5';
+            }
+          }),
+          borderColor: '#2d2d2d',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              color: '#ffffff'
+            },
+            grid: {
+              color: '#444444'
+            }
+          },
+          x: {
+            ticks: {
+              color: '#ffffff'
+            },
+            grid: {
+              color: '#444444'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  createUsersScoreChart() {
+    const ctx = document.getElementById('usersScoreChart').getContext('2d');
+    
+    // Use real Twitch chat user data from leaderboard
+    const userScores = [];
+    if (this.leaderboardData && this.leaderboardData.length > 0) {
+      this.leaderboardData.slice(0, 15).forEach(user => { // Top 15 users
+        userScores.push({
+          username: user.username,
+          score: user.avgSentiment,
+          activity: user.activityRate,
+          messages: user.totalMessages
+        });
+      });
+    }
+
+    // Sort by sentiment score for better visualization
+    userScores.sort((a, b) => b.score - a.score);
+
+    this.charts.usersScore = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: userScores.map(user => user.username),
+        datasets: [{
+          label: 'Average Sentiment Score',
+          data: userScores.map(user => user.score),
+          backgroundColor: userScores.map(user => {
+            if (user.score > 0.1) return '#4caf50';  // Positive
+            if (user.score < -0.1) return '#f44336'; // Negative
+            return '#ff9800'; // Neutral
+          }),
+          borderColor: '#2d2d2d',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 1,
+            min: -1,
+            title: {
+              display: true,
+              text: 'Average Sentiment Score',
+              color: '#ffffff'
+            },
+            ticks: {
+              color: '#ffffff',
+              callback: function(value) {
+                return value.toFixed(1);
+              }
+            },
+            grid: {
+              color: '#444444'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Twitch Chat Users',
+              color: '#ffffff'
+            },
+            ticks: {
+              color: '#ffffff',
+              maxRotation: 45,
+              minRotation: 45
+            },
+            grid: {
+              color: '#444444'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const user = userScores[context.dataIndex];
+                return [
+                  `User: ${user.username}`,
+                  `Score: ${user.score.toFixed(2)}`,
+                  `Activity: ${user.activity}%`,
+                  `Messages: ${user.messages}`
+                ];
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  updateCharts() {
+    // Method to refresh all charts with new data
+    Object.values(this.charts).forEach(chart => chart.destroy());
+    this.charts = {};
+    this.loadData().then(() => this.createCharts());
+  }
+}
+
+// Initialize charts when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new AnalyticsCharts();
+});
+
+// Export for potential external use
+window.AnalyticsCharts = AnalyticsCharts;

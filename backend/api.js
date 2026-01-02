@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { connectToMongo } = require('./src/mongo-connection');
 const { usersRouter, dataRouter, channelsRouter, authRouter } = require('./src/endpoints');
+const analyticsRouter = require('./src/endpoints/analytics');
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/data', dataRouter);
 app.use('/channels', channelsRouter);
+app.use('/', analyticsRouter);
 
 // Start server with MongoDB connection
 async function startServer() {

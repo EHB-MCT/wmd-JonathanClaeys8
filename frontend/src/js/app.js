@@ -16,7 +16,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const user = checkModeratorAccess();
   if (!user) return; // Will redirect if not authorized
   
-  // Display user email
+  // Set active navigation link
+  setActiveNavLink();
+  
+  // Display user info in navbar
   displayUserInfo();
   
   initializeElements();

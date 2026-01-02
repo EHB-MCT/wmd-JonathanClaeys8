@@ -4,6 +4,83 @@
   box-sizing: border-box;
 }
 
+/* Navigation Bar Styles */
+.navbar {
+  background-color: #2d2d2d;
+  border-bottom: 2px solid #6441a5;
+  padding: 0 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  display: none;
+}
+
+.navbar-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin: 0 10px;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+  font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: #6441a5;
+  color: #ffffff;
+}
+
+.navbar-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.navbar-user .user-info {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.navbar-user .logout-btn {
+  background-color: #f44336;
+  margin-top: 2px;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.navbar-user .logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Add space below navbar for content */
+.navbar + * {
+  margin-top: 20px;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #1e1e1e;
@@ -502,7 +579,8 @@ body {
 }
 
 /* Registration and Viewer Pages */
-.register-container, .viewer-container {
+.register-container,
+.viewer-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -510,17 +588,19 @@ body {
   background-color: #1e1e1e;
 }
 
-.register-form, .viewer-content {
+.register-form,
+.viewer-content {
   background-color: #2d2d2d;
   padding: 40px;
   border-radius: 12px;
   border-left: 4px solid #6441a5;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   width: 100%;
   max-width: 400px;
 }
 
-.register-form h1, .viewer-content h1 {
+.register-form h1,
+.viewer-content h1 {
   color: #6441a5;
   text-align: center;
   margin-bottom: 30px;
@@ -547,6 +627,13 @@ body {
   display: inline-block;
 }
 
+.viewer-info .navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -558,7 +645,8 @@ body {
   font-weight: bold;
 }
 
-.form-group input, .form-group select {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 12px;
   border: 1px solid #555;
@@ -569,7 +657,8 @@ body {
   box-sizing: border-box;
 }
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #6441a5;
 }
@@ -627,14 +716,8 @@ body {
 }
 
 .moderator-info {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+  /* Moved to navbar - keeping for compatibility */
+  display: none;
 }
 
 .user-email {
@@ -645,6 +728,8 @@ body {
   color: #ffffff;
   border: 1px solid #6441a5;
 }
+
+/* Old navigation button styles - replaced by navbar */
 
 .sentiment-positive {
   background-color: rgba(76, 175, 80, 0.15);

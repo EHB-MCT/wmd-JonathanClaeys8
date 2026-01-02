@@ -36,30 +36,57 @@ function logout() {
   window.location.href = "login.html";
 }
 
-// Display user username in the UI
+// Display user username in the navbar
 function displayUserInfo() {
   const userData = localStorage.getItem("userData");
-  if (userData) {
+  const navbarUser = document.querySelector('.navbar-user');
+  
+  if (userData && navbarUser) {
     const user = JSON.parse(userData);
     
-    // Update index.html (moderator page)
-    const moderatorInfo = document.querySelector('.moderator-info');
-    if (moderatorInfo && user.username) {
-      const usernameSpan = document.createElement('span');
-      usernameSpan.className = 'user-email';
-      usernameSpan.textContent = `Logged in as: ${user.username}`;
-      moderatorInfo.insertBefore(usernameSpan, moderatorInfo.firstChild);
-    }
+    // Clear existing content
+    navbarUser.innerHTML = '';
     
-    // Update viewer.html
-    const viewerInfo = document.querySelector('.viewer-info');
-    if (viewerInfo && user.username) {
-      const usernameP = document.createElement('p');
-      usernameP.className = 'user-email';
-      usernameP.textContent = `Logged in as: ${user.username}`;
-      viewerInfo.insertBefore(usernameP, viewerInfo.firstChild);
-    }
+    // Add logout button
+    const logoutBtn = document.createElement('button');
+    logoutBtn.className = 'logout-btn';
+    logoutBtn.textContent = 'Logout';
+    logoutBtn.onclick = logout;
+    navbarUser.appendChild(logoutBtn);
+  } else if (navbarUser) {
+    // Clear if not logged in
+    navbarUser.innerHTML = '';
   }
+}
+
+// Set active navigation link based on current page
+function setActiveNavLink() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === currentPage) {
+      link.classList.add('active');
+    }
+  });
+}
+
+// Navigation functions
+function goToViewer() {
+  window.location.href = 'viewer.html';
+}
+
+function goToModerator() {
+  window.location.href = 'index.html';
+}
+
+function goToLogin() {
+  window.location.href = 'login.html';
+}
+
+function goToRegister() {
+  window.location.href = 'register.html';
 }
 
 // Export for global access
@@ -67,3 +94,4 @@ window.checkModeratorAccess = checkModeratorAccess;
 window.checkViewerAccess = checkViewerAccess;
 window.logout = logout;
 window.displayUserInfo = displayUserInfo;
+window.setActiveNavLink = setActiveNavLink;

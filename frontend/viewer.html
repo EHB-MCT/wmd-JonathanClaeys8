@@ -7,12 +7,26 @@
     <link rel="stylesheet" href="src/css/styles.css?v=2.2" />
   </head>
   <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <ul class="navbar-menu">
+        <li class="nav-item">
+          <a href="viewer.html" class="nav-link active">Viewer</a>
+        </li>
+        <li class="nav-item">
+          <a href="index.html" class="nav-link">Moderation</a>
+        </li>
+      </ul>
+      <div class="navbar-user">
+        <!-- User info will be injected here by JavaScript -->
+      </div>
+    </nav>
+    
     <div class="viewer-container">
       <div class="viewer-content">
         <h1>Viewer-page</h1>
         <div class="viewer-info">
           <p>You are logged in as a viewer.</p>
-          <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
       </div>
     </div>

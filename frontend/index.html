@@ -7,6 +7,21 @@
     <link rel="stylesheet" href="src/css/styles.css?v=2.1" />
   </head>
   <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <ul class="navbar-menu">
+        <li class="nav-item">
+          <a href="viewer.html" class="nav-link">Viewer</a>
+        </li>
+        <li class="nav-item">
+          <a href="index.html" class="nav-link active">Moderation</a>
+        </li>
+      </ul>
+      <div class="navbar-user">
+        <!-- User info will be injected here by JavaScript -->
+      </div>
+    </nav>
+    
     <div class="header">
       <div class="channel-info">
         <!-- Add Channel Form -->
@@ -35,10 +50,7 @@
       </div>
     </div>
     
-    <!-- Moderator Info -->
-    <div class="moderator-info">
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+    <!-- Moderator Info - Removed, now in navbar -->
     </div>
 
     <h3 id="messages-title" class="messages-title">Logs from all channels</h3>

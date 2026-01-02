@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const user = checkViewerAccess();
     if (!user) return; // Will redirect if not authorized
     
-    // Display user email
+    // Set active navigation link
+    setActiveNavLink();
+    
+    // Display user info in navbar
     displayUserInfo();
 });

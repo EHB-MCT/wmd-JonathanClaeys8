@@ -1,27 +1,28 @@
 const express = require('express');
 const { getDb } = require("../mongo-connection");
+const { authenticateToken } = require("../middleware/auth");
 const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
 
-// Store active channels in MongoDB for persistence
-async function getTrackedChannels() {
+// Store active channels in MongoDB for persistence - now per user
+async function getTrackedChannels(userId) {
   try {
     const db = getDb();
-    const result = await db.collection('tracked_channels').findOne({ id: 'active_channels' });
-    return result ? result.channels : ['Poofplay'];
+    const result = await db.collection('user_channels').findOne({ userId });
+    return result ? result.channels : [];
   } catch (error) {
     console.error('Error getting tracked channels:', error);
-    return ['Poofplay'];
+    return [];
   }
 }
 
-async function saveTrackedChannels(channels) {
+async function saveTrackedChannels(userId, channels) {
   try {
     const db = getDb();
-    await db.collection('tracked_channels').updateOne(
-      { id: 'active_channels' },
+    await db.collection('user_channels').updateOne(
+      { userId },
       { $set: { channels, updated_at: new Date() } },
       { upsert: true }
     );
@@ -32,19 +33,21 @@ async function saveTrackedChannels(channels) {
   }
 }
 
-// GET /channels - Get all tracked channels
-router.get('/', async (req, res) => {
+// GET /channels - Get all tracked channels for authenticated user
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const channels = await getTrackedChannels();
+    const userId = req.user.userId;
+    const channels = await getTrackedChannels(userId);
     res.json({ success: true, channels });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// POST /channels/add - Add a new channel
-router.post('/add', async (req, res) => {
+// POST /channels/add - Add a new channel for authenticated user
+router.post('/add', authenticateToken, async (req, res) => {
   try {
+    const userId = req.user.userId;
     const { channelName } = req.body;
     
     if (!channelName || channelName.trim() === '') {
@@ -53,14 +56,22 @@ router.post('/add', async (req, res) => {
     
     const cleanChannelName = channelName.trim().replace('#', '').toLowerCase();
     
-    const channels = await getTrackedChannels();
+    const channels = await getTrackedChannels(userId);
     if (channels.includes(cleanChannelName)) {
       return res.status(400).json({ success: false, error: 'Channel already being tracked' });
     }
     
     channels.push(cleanChannelName);
     
-    if (await saveTrackedChannels(channels)) {
+    if (await saveTrackedChannels(userId, channels)) {
+      // Trigger Twitch listener update
+      try {
+        // This will be picked up by the listener's periodic check
+        console.log(`Channel ${cleanChannelName} added by user ${userId}, listener will update in 30s or less`);
+      } catch (err) {
+        console.error('Error triggering listener update:', err);
+      }
+      
       res.json({ success: true, message: `Added channel: ${cleanChannelName}`, channels });
     } else {
       res.status(500).json({ success: false, error: 'Failed to save channel' });
@@ -70,13 +81,14 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// DELETE /channels/:channelName - Remove a channel
-router.delete('/:channelName', async (req, res) => {
+// DELETE /channels/:channelName - Remove a channel for authenticated user
+router.delete('/:channelName', authenticateToken, async (req, res) => {
   try {
+    const userId = req.user.userId;
     const { channelName } = req.params;
     const cleanChannelName = channelName.trim().replace('#', '').toLowerCase();
     
-    const channels = await getTrackedChannels();
+    const channels = await getTrackedChannels(userId);
     const index = channels.indexOf(cleanChannelName);
     
     if (index === -1) {
@@ -85,7 +97,7 @@ router.delete('/:channelName', async (req, res) => {
     
     channels.splice(index, 1);
     
-    if (await saveTrackedChannels(channels)) {
+    if (await saveTrackedChannels(userId, channels)) {
       res.json({ success: true, message: `Removed channel: ${cleanChannelName}`, channels });
     } else {
       res.status(500).json({ success: false, error: 'Failed to remove channel' });
@@ -95,12 +107,14 @@ router.delete('/:channelName', async (req, res) => {
   }
 });
 
-// GET /channels/messages - Get all messages grouped by channel
-router.get('/messages', async (req, res) => {
+// GET /channels/messages - Get all messages for authenticated user
+router.get('/messages', authenticateToken, async (req, res) => {
   try {
+    const userId = req.user.userId;
     const db = getDb();
     const messages = await db.collection('chatmessages')
       .aggregate([
+        { $match: { userId: userId } },
         { $sort: { timestamp: -1 } },
         { $limit: 200 },
         {

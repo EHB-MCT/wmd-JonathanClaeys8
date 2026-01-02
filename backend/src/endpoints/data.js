@@ -1,15 +1,17 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const { getDb } = require("../mongo-connection");
+const { authenticateToken } = require("../middleware/auth");
 
 const router = express.Router();
 
-// GET /data - Get all chat messages
-router.get('/', async (req, res) => {
+// GET /data - Get all chat messages for authenticated user
+router.get('/', authenticateToken, async (req, res) => {
   try {
+    const userId = req.user.userId;
     const db = getDb();
     const data = await db.collection('chatmessages')
-      .find({})
+      .find({ userId })
       .sort({ timestamp: -1 })
       .limit(100)
       .toArray();
@@ -33,12 +35,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /data - Add new chat message
-router.post('/', async (req, res) => {
+// POST /data - Add new chat message for authenticated user
+router.post('/', authenticateToken, async (req, res) => {
   try {
+    const userId = req.user.userId;
     const db = getDb();
     const newMessage = { 
       ...req.body, 
+      userId,
       timestamp: new Date()
     };
     const result = await db.collection('chatmessages').insertOne(newMessage);

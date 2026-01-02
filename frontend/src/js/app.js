@@ -1,6 +1,6 @@
 // Configuration
-const API_BASE_URL = "http://localhost/api/data";
-const CHANNELS_API_URL = "http://localhost/api/channels";
+const API_BASE_URL = "http://localhost:3000/data";
+const CHANNELS_API_URL = "http://localhost:3000/channels";
 
 // DOM Elements
 let channelsList,
@@ -12,12 +12,12 @@ let channelsList,
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function () {
+  // Set active navigation link
+  setActiveNavLink();
+  
   // Check moderator access first
   const user = checkModeratorAccess();
   if (!user) return; // Will redirect if not authorized
-  
-  // Set active navigation link
-  setActiveNavLink();
   
   // Display user info in navbar
   displayUserInfo();
@@ -60,7 +60,18 @@ function init() {
 // Fetch and display channels
 async function fetchChannels() {
   try {
-    const response = await fetch(CHANNELS_API_URL);
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error("No authentication token found");
+      return [];
+    }
+    
+    const response = await fetch(CHANNELS_API_URL, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
     const data = await response.json();
     if (data.success && data.channels) {
       displayChannelsList(data.channels);
@@ -114,6 +125,13 @@ async function addChannel() {
     return;
   }
 
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    feedback.innerHTML =
+      '<div class="error-message">Please login to add channels</div>';
+    return;
+  }
+
   // Disable button and show loading
   addButton.disabled = true;
   addButton.textContent = "Adding...";
@@ -124,6 +142,7 @@ async function addChannel() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({ channelName: channelName }),
     });
@@ -163,6 +182,12 @@ async function deleteChannel(channelName) {
 
   const originalText = button.textContent;
 
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert("Please login to delete channels");
+    return;
+  }
+
   // Disable button and show loading
   button.disabled = true;
   button.textContent = "Deleting...";
@@ -170,6 +195,9 @@ async function deleteChannel(channelName) {
   try {
     const response = await fetch(`${CHANNELS_API_URL}/${channelName}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
     });
 
     const data = await response.json();
@@ -197,10 +225,17 @@ async function deleteChannel(channelName) {
 // Fetch and display messages
 async function fetchMessages() {
   try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error("No authentication token found");
+      return;
+    }
+    
     const response = await fetch(API_BASE_URL, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
     });
 

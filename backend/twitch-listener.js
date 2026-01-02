@@ -5,15 +5,23 @@ const { connectToMongo, getDb } = require('./src/mongo-connection');
 let currentClient = null;
 let currentChannels = [];
 
-// Get channels from database
-async function getTrackedChannels() {
+// Get all tracked channels from all users
+async function getAllTrackedChannels() {
   try {
     const db = getDb();
-    const result = await db.collection('tracked_channels').findOne({ id: 'active_channels' });
-    return result ? result.channels : ['Poofplay'];
+    const userChannels = await db.collection('user_channels').find({}).toArray();
+    
+    // Collect all unique channels from all users
+    const allChannels = new Set();
+    userChannels.forEach(user => {
+      user.channels.forEach(channel => allChannels.add(channel));
+    });
+    
+    console.log(`Found ${allChannels.size} unique channels from ${userChannels.length} users`);
+    return Array.from(allChannels);
   } catch (error) {
     console.error('Error getting tracked channels:', error);
-    return ['Poofplay'];
+    return [];
   }
 }
 
@@ -64,20 +72,48 @@ async function startTwitchClient(channels) {
 
     try {
       const db = getDb();
+      
+      // Find which users are tracking this channel
+      const trackingUsers = await db.collection('user_channels').find({
+        channels: channel.replace('#', '').toLowerCase()
+      }).toArray();
+      
+      if (trackingUsers.length === 0) {
+        console.log(`No users tracking channel ${channel}, skipping message`);
+        return;
+      }
+      
+      // Create message data without userId for now (will be associated when users query)
       const messageData = {
         username: username,
         message: message,
-        channel: channel,
+        channel: channel.replace('#', '').toLowerCase(),
         sentiment: emotion,
         sentimentScore: result.score,
         timestamp: new Date(),
-        userId: tags['user-id'],
+        twitchUserId: tags['user-id'], // Twitch user ID, not our app user ID
         badges: tags.badges || {},
         color: tags.color || '#ffffff'
       };
 
-      await db.collection('chatmessages').insertOne(messageData);
-      console.log(`✓ Saved message from ${username} in ${channel}`);
+      // Save one copy of the message for each tracking user, but only if message is after their registration
+      for (const user of trackingUsers) {
+        // Get user's registration time
+        const userInfo = await db.collection('users').findOne({ _id: user.userId });
+        
+        if (userInfo && messageData.timestamp >= userInfo.createdAt) {
+          await db.collection('chatmessages').insertOne({
+            ...messageData,
+            userId: user.userId // Associate with our app user
+          });
+          console.log(`✓ Saved message from ${username} in ${channel} for user ${user.userId}`);
+        } else {
+          // Skip saving messages older than user registration
+          console.log(`⏭ Skipped old message from ${username} for user ${user.userId} (message: ${messageData.timestamp}, registered: ${userInfo?.createdAt})`);
+        }
+      }
+      
+      console.log(`✓ Saved message from ${username} in ${channel} for ${trackingUsers.length} user(s)`);
     } catch (error) {
       console.error('Error saving message to MongoDB:', error);
     }
@@ -95,7 +131,7 @@ async function startTwitchClient(channels) {
 // Check for channel changes and reconnect if needed
 async function checkAndReconnectIfNecessary() {
   try {
-    const channels = await getTrackedChannels();
+    const channels = await getAllTrackedChannels();
     
     if (JSON.stringify(channels.sort()) !== JSON.stringify(currentChannels.sort())) {
       console.log('🔄 Channel list changed, reconnecting...');
@@ -113,8 +149,8 @@ async function startTwitchListener() {
     await connectToMongo();
     console.log("MongoDB connected for Twitch listener");
     
-    // Get initial channels
-    currentChannels = await getTrackedChannels();
+    // Get initial channels from all users
+    currentChannels = await getAllTrackedChannels();
     
     // Start client
     await startTwitchClient(currentChannels);

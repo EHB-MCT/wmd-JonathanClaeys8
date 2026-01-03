@@ -30,13 +30,14 @@ function checkViewerAccess() {
   return JSON.parse(userData);
 }
 
+// User logout function
 function logout() {
   localStorage.removeItem("userData");
   localStorage.removeItem("authToken");
   window.location.href = "login.html";
 }
 
-// Display user username in the navbar
+// Display user info in navbar
 function displayUserInfo() {
   const userData = localStorage.getItem("userData");
   const navbarUser = document.querySelector('.navbar-user');
@@ -81,15 +82,7 @@ function goToModerator() {
   window.location.href = 'index.html';
 }
 
-function goToLogin() {
-  window.location.href = 'login.html';
-}
-
-function goToRegister() {
-  window.location.href = 'register.html';
-}
-
-// Export for global access
+// Export auth functions for global access
 window.checkModeratorAccess = checkModeratorAccess;
 window.checkViewerAccess = checkViewerAccess;
 window.logout = logout;

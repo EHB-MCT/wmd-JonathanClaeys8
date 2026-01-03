@@ -123,6 +123,22 @@
   height: auto !important;
 }
 
+.leaderboard-full-width {
+  flex: 2;
+}
+
+.leaderboard-full-width canvas {
+  max-height: 400px;
+}
+
+.users-score-full-width {
+  flex: 2;
+}
+
+.users-score-full-width canvas {
+  max-height: 400px;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #1e1e1e;

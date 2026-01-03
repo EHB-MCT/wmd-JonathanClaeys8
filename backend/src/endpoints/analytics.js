@@ -1,15 +1,29 @@
 const express = require('express');
 const { getDb } = require("../mongo-connection");
+const { authenticateToken } = require("../middleware/auth");
 
 const router = express.Router();
 
+// Conditional authentication middleware
+const conditionalAuth = (req, res, next) => {
+  const isGlobal = req.query.global === 'true';
+  if (isGlobal) {
+    // Skip authentication for global endpoints
+    next();
+  } else {
+    // Require authentication for user-specific endpoints
+    authenticateToken(req, res, next);
+  }
+};
+
 // GET /leaderboard - Get Twitch chat users ranked by activity
-router.get('/leaderboard', async (req, res) => {
+router.get('/leaderboard', conditionalAuth, async (req, res) => {
   try {
     const db = getDb();
+    const isGlobal = req.query.global === 'true';
     
     // Aggregate chat messages to get real Twitch user activity
-    const userStats = await db.collection('chatmessages').aggregate([
+    const pipeline = [
       {
         $group: {
           _id: '$username',
@@ -38,7 +52,16 @@ router.get('/leaderboard', async (req, res) => {
       },
       { $sort: { totalMessages: -1 } },
       { $limit: 10 }
-    ]).toArray();
+    ];
+
+    // If not global, add user-specific filter
+    if (!isGlobal && req.user && req.user.userId) {
+      pipeline.unshift({
+        $match: { userId: req.user.userId }
+      });
+    }
+
+    const userStats = await db.collection('chatmessages').aggregate(pipeline).toArray();
 
     // Add risk level based on sentiment and activity
     const leaderboard = userStats.map(user => ({
@@ -58,12 +81,13 @@ router.get('/leaderboard', async (req, res) => {
 });
 
 // GET /scatterplot - Get data for activity vs sentiment scatterplot from Twitch chat users
-router.get('/scatterplot', async (req, res) => {
+router.get('/scatterplot', conditionalAuth, async (req, res) => {
   try {
     const db = getDb();
+    const isGlobal = req.query.global === 'true';
     
-    // Aggregate chat messages for scatter plot data
-    const scatterData = await db.collection('chatmessages').aggregate([
+    // Build aggregation pipeline
+    const pipeline = [
       {
         $group: {
           _id: '$username',
@@ -88,7 +112,16 @@ router.get('/scatterplot', async (req, res) => {
       },
       { $sort: { totalMessages: -1 } },
       { $limit: 50 } // Limit to top 50 most active users
-    ]).toArray();
+    ];
+
+    // If not global, add user-specific filter
+    if (!isGlobal && req.user && req.user.userId) {
+      pipeline.unshift({
+        $match: { userId: req.user.userId }
+      });
+    }
+
+    const scatterData = await db.collection('chatmessages').aggregate(pipeline).toArray();
     
     res.json({ success: true, data: scatterData });
   } catch (error) {
@@ -97,14 +130,24 @@ router.get('/scatterplot', async (req, res) => {
 });
 
 // GET /channel-activity - Get channel activity data for last 24 hours from Twitch chat
-router.get('/channel-activity', async (req, res) => {
+router.get('/channel-activity', conditionalAuth, async (req, res) => {
   try {
     const db = getDb();
+    const isGlobal = req.query.global === 'true';
     
     // Get real messages from the last 24 hours
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    // Build query filter
+    const query = { timestamp: { $gte: twentyFourHoursAgo } };
+    
+    // If not global, add user-specific filter
+    if (!isGlobal && req.user && req.user.userId) {
+      query.userId = req.user.userId;
+    }
+    
     const messages = await db.collection('chatmessages')
-      .find({ timestamp: { $gte: twentyFourHoursAgo } })
+      .find(query)
       .toArray();
 
     // Group messages by hour
@@ -141,12 +184,13 @@ router.get('/channel-activity', async (req, res) => {
 });
 
 // GET /sentiment-distribution - Get sentiment distribution from Twitch chat messages
-router.get('/sentiment-distribution', async (req, res) => {
+router.get('/sentiment-distribution', conditionalAuth, async (req, res) => {
   try {
     const db = getDb();
+    const isGlobal = req.query.global === 'true';
     
-    // Aggregate sentiment from all chat messages
-    const sentimentStats = await db.collection('chatmessages').aggregate([
+    // Build aggregation pipeline
+    const pipeline = [
       {
         $group: {
           _id: '$sentiment',
@@ -160,7 +204,16 @@ router.get('/sentiment-distribution', async (req, res) => {
           count: 1
         }
       }
-    ]).toArray();
+    ];
+
+    // If not global, add user-specific filter
+    if (!isGlobal && req.user && req.user.userId) {
+      pipeline.unshift({
+        $match: { userId: req.user.userId }
+      });
+    }
+
+    const sentimentStats = await db.collection('chatmessages').aggregate(pipeline).toArray();
 
     // Format for chart
     const distribution = {

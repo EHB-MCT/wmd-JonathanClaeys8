@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Viewer Page - Chat Moderation</title>
+    <title>Global Analytics Dashboard - Chat Moderation</title>
     <link rel="stylesheet" href="src/css/styles.css?v=2.2" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -22,15 +23,17 @@
       </div>
     </nav>
     
-    <div class="viewer-container">
-      <div class="viewer-content">
-        <h1>Viewer-page</h1>
-        <div class="viewer-info">
-          <p>You are logged in as a viewer.</p>
+    <!-- Global Leaderboard Dashboard -->
+    <div class="charts-container">
+      <div class="chart-row">
+        <div class="chart-container leaderboard-full-width">
+          <h3>Global Users Leaderboard</h3>
+          <canvas id="leaderboardChart"></canvas>
         </div>
       </div>
     </div>
     
+    <script src="src/js/auth.js?v=2.2"></script>
     <script src="src/js/viewer.js?v=2.2"></script>
   </body>
 </html>

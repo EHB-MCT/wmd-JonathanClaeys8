@@ -16,16 +16,14 @@ class AnalyticsCharts {
       const apiBase = isDevServer ? 'http://localhost:3000' : '/api';
       
       // Fetch all necessary data - using appropriate API endpoint
-      const [sentimentResponse, leaderboardResponse, scatterResponse, activityResponse] = await Promise.all([
+      const [sentimentResponse, scatterResponse, activityResponse] = await Promise.all([
         fetch(`${apiBase}/sentiment-distribution`).then(res => res.json()),
-        fetch(`${apiBase}/leaderboard`).then(res => res.json()),
         fetch(`${apiBase}/scatterplot`).then(res => res.json()),
         fetch(`${apiBase}/channel-activity`).then(res => res.json())
       ]);
 
       // Extract data from response format
       this.sentimentData = sentimentResponse.success ? sentimentResponse.data : sentimentResponse;
-      this.leaderboardData = leaderboardResponse.success ? leaderboardResponse.data : leaderboardResponse;
       this.scatterData = scatterResponse.success ? scatterResponse.data : scatterResponse;
       this.channelActivityData = activityResponse.success ? activityResponse.data : activityResponse;
     } catch (error) {
@@ -41,14 +39,6 @@ class AnalyticsCharts {
       negative: 67,
       neutral: 89
     };
-
-    this.leaderboardData = [
-      { username: 'StreamViewer123', totalMessages: 234, avgSentiment: 0.3, activityRate: 85, riskLevel: 'low', channelCount: 2 },
-      { username: 'ChatUser456', totalMessages: 189, avgSentiment: -0.5, activityRate: 92, riskLevel: 'high', channelCount: 1 },
-      { username: 'GamerPro789', totalMessages: 156, avgSentiment: 0.1, activityRate: 67, riskLevel: 'medium', channelCount: 3 },
-      { username: 'TwitchFan01', totalMessages: 145, avgSentiment: 0.7, activityRate: 78, riskLevel: 'low', channelCount: 1 },
-      { username: 'EmojiKing', totalMessages: 98, avgSentiment: -0.2, activityRate: 45, riskLevel: 'medium', channelCount: 2 }
-    ];
 
     this.scatterData = [
       { username: 'StreamViewer123', activityRate: 85, avgSentiment: 0.3, totalMessages: 234 },
@@ -72,7 +62,6 @@ class AnalyticsCharts {
     this.createSentimentChart();
     this.createChannelActivityChart();
     this.createUsersScoreChart();
-    this.createLeaderboardChart();
   }
 
   createSentimentChart() {
@@ -202,74 +191,20 @@ class AnalyticsCharts {
     });
   }
 
-  createLeaderboardChart() {
-    const ctx = document.getElementById('leaderboardChart').getContext('2d');
-    
-    const topUsers = this.leaderboardData.slice(0, 5);
-    
-    this.charts.leaderboard = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: topUsers.map(user => user.username),
-        datasets: [{
-          label: 'Activity Rate',
-          data: topUsers.map(user => user.activityRate),
-          backgroundColor: topUsers.map(user => {
-            switch(user.riskLevel) {
-              case 'high': return '#f44336';
-              case 'medium': return '#ff9800';
-              case 'low': return '#4caf50';
-              default: return '#6441a5';
-            }
-          }),
-          borderColor: '#2d2d2d',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              color: '#ffffff'
-            },
-            grid: {
-              color: '#444444'
-            }
-          },
-          x: {
-            ticks: {
-              color: '#ffffff'
-            },
-            grid: {
-              color: '#444444'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-  }
+
 
   createUsersScoreChart() {
     const ctx = document.getElementById('usersScoreChart').getContext('2d');
     
-    // Use real Twitch chat user data from leaderboard
+    // Use real Twitch chat user data from scatter
     const userScores = [];
-    if (this.leaderboardData && this.leaderboardData.length > 0) {
-      this.leaderboardData.slice(0, 15).forEach(user => { // Top 15 users
+    if (this.scatterData && this.scatterData.length > 0) {
+      this.scatterData.slice(0, 15).forEach(user => { // Top 15 users
         userScores.push({
           username: user.username,
-          score: user.avgSentiment,
-          activity: user.activityRate,
-          messages: user.totalMessages
+          score: user.avgSentiment || user.score,
+          activity: user.activityRate || user.activity,
+          messages: user.totalMessages || user.messages
         });
       });
     }

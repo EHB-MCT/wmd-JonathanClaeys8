@@ -246,6 +246,12 @@ async function fetchMessages() {
     const data = await response.json();
 
     if (data.success && data.data) {
+      console.log('DATA FROM API:', data.data);
+      console.log('TOTAL MESSAGES:', data.data.length);
+      data.data.forEach((msg, index) => {
+        console.log(`Message ${index + 1}:`, msg);
+      });
+      
       displayMessages(data.data);
       displaySuspiciousUsers(data.data);
     } else {

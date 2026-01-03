@@ -10,11 +10,31 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
     const db = getDb();
+    
+    // Get channels this user is tracking
+    const userChannels = await db.collection('user_channels').findOne({ userId });
+    
+    console.log('DEBUG: Looking for userId:', userId);
+    console.log('DEBUG: Found userChannels:', userChannels);
+    
+    if (!userChannels || userChannels.channels.length === 0) {
+      console.log('User', userId, 'is not tracking any channels');
+      return res.json({ success: true, data: [] });
+    }
+    
+    // Get messages from all channels this user tracks
     const data = await db.collection('chatmessages')
-      .find({ userId })
+      .find({ 
+        userId: userId,
+        channel: { $in: userChannels.channels }
+      })
       .sort({ timestamp: -1 })
       .limit(100)
       .toArray();
+    
+    console.log('DATA RETRIEVED for user', userId, ':', data.length, 'messages');
+    console.log('TRACKED CHANNELS:', userChannels.channels);
+    
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -47,7 +67,13 @@ router.post('/', authenticateToken, async (req, res) => {
       userId,
       timestamp: new Date()
     };
+    
+    console.log('INSERTING MESSAGE:', newMessage);
+    
     const result = await db.collection('chatmessages').insertOne(newMessage);
+    
+    console.log('MESSAGE INSERTED WITH ID:', result.insertedId);
+    
     res.status(201).json({ 
       success: true, 
       message: 'Message added successfully', 

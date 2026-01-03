@@ -1,6 +1,7 @@
 const tmi = require("tmi.js");
 const Sentiment = require("sentiment");
 const { connectToMongo, getDb } = require('./src/mongo-connection');
+const { ObjectId } = require('mongodb');
 
 let currentClient = null;
 let currentChannels = [];
@@ -53,6 +54,11 @@ async function startTwitchClient(channels) {
 
   client.on('connected', () => {
     console.log('✓ Connected to Twitch chat');
+    console.log('📊 Connection details:', {
+      username: client.getUsername(),
+      channels: client.getChannels(),
+      isConnected: client.readyState() === 'OPEN'
+    });
   });
   
   client.on('disconnected', () => {
@@ -96,20 +102,30 @@ async function startTwitchClient(channels) {
         color: tags.color || '#ffffff'
       };
 
-      // Save one copy of the message for each tracking user, but only if message is after their registration
+      // Save one copy of the message for each tracking user
+      console.log(`DEBUG: Processing message from ${username} in ${channel}`);
+      console.log(`DEBUG: Found ${trackingUsers.length} tracking users:`, trackingUsers.map(u => u.userId));
+      
       for (const user of trackingUsers) {
-        // Get user's registration time
-        const userInfo = await db.collection('users').findOne({ _id: user.userId });
+        // Convert userId to ObjectId for proper database query
+        const userIdObjectId = typeof user.userId === 'string' ? new ObjectId(user.userId) : user.userId;
         
-        if (userInfo && messageData.timestamp >= userInfo.createdAt) {
+        // Get user information
+        const userInfo = await db.collection('users').findOne({ _id: userIdObjectId });
+        
+        if (!userInfo) {
+          console.log(`⚠️ User ${user.userId} not found in users collection, skipping message`);
+          continue;
+        }
+        
+        try {
           await db.collection('chatmessages').insertOne({
             ...messageData,
-            userId: user.userId // Associate with our app user
+            userId: user.userId // Keep original userId format for consistency
           });
           console.log(`✓ Saved message from ${username} in ${channel} for user ${user.userId}`);
-        } else {
-          // Skip saving messages older than user registration
-          console.log(`⏭ Skipped old message from ${username} for user ${user.userId} (message: ${messageData.timestamp}, registered: ${userInfo?.createdAt})`);
+        } catch (insertError) {
+          console.error(`Failed to save message for user ${user.userId}:`, insertError);
         }
       }
       

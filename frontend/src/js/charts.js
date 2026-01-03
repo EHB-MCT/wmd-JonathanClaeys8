@@ -15,11 +15,22 @@ class AnalyticsCharts {
       const isDevServer = window.location.port === '5500' || window.location.hostname === '127.0.0.1';
       const apiBase = isDevServer ? 'http://localhost:3000' : '/api';
       
-      // Fetch all necessary data - using appropriate API endpoint
+      // Get authentication token from localStorage
+      const token = localStorage.getItem('authToken');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      // Fetch all necessary data with authentication headers
       const [sentimentResponse, scatterResponse, activityResponse] = await Promise.all([
-        fetch(`${apiBase}/sentiment-distribution`).then(res => res.json()),
-        fetch(`${apiBase}/scatterplot`).then(res => res.json()),
-        fetch(`${apiBase}/channel-activity`).then(res => res.json())
+        fetch(`${apiBase}/sentiment-distribution`, { headers }).then(res => res.json()),
+        fetch(`${apiBase}/scatterplot`, { headers }).then(res => res.json()),
+        fetch(`${apiBase}/channel-activity`, { headers }).then(res => res.json())
       ]);
 
       // Extract data from response format
@@ -297,10 +308,29 @@ class AnalyticsCharts {
   }
 }
 
-// Initialize charts when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  new AnalyticsCharts();
-});
+// Initialize charts immediately when script loads with DOM ready check
+function initChartsWhenReady() {
+  console.log('🔍 Charts.js: Initializing charts');
+  console.log('🔍 DOM Ready State:', document.readyState);
+  
+  const userData = localStorage.getItem('userData');
+  const authToken = localStorage.getItem('authToken');
+  console.log('🔍 User Data:', userData ? 'EXISTS' : 'MISSING');
+  console.log('🔍 Auth Token:', authToken ? 'EXISTS' : 'MISSING');
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🔍 Charts.js: DOM loaded, creating AnalyticsCharts');
+      new AnalyticsCharts();
+    });
+  } else {
+    // DOM is already loaded
+    console.log('🔍 Charts.js: DOM already loaded, creating AnalyticsCharts');
+    new AnalyticsCharts();
+  }
+}
+
+initChartsWhenReady();
 
 // Export for potential external use
 window.AnalyticsCharts = AnalyticsCharts;

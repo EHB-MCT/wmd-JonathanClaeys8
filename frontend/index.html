@@ -79,8 +79,21 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="src/js/charts.js?v=1.0"></script>
     <script src="src/js/auth.js?v=2.2"></script>
     <script src="src/js/app.js?v=2.2"></script>
+    <script>
+      // Initialize charts only if user is authenticated
+      document.addEventListener('DOMContentLoaded', function() {
+        const userData = localStorage.getItem('userData');
+        const authToken = localStorage.getItem('authToken');
+        
+        if (userData && authToken) {
+          // User is authenticated, load charts
+          const script = document.createElement('script');
+          script.src = 'src/js/charts.js?v=1.0';
+          document.head.appendChild(script);
+        }
+      });
+    </script>
   </body>
 </html>

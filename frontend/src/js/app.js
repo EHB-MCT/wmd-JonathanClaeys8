@@ -14,14 +14,14 @@ let channelsList,
 document.addEventListener("DOMContentLoaded", function () {
   // Set active navigation link
   setActiveNavLink();
-  
+
   // Check moderator access first
   const user = checkModeratorAccess();
   if (!user) return; // Will redirect if not authorized
-  
+
   // Display user info in navbar
   displayUserInfo();
-  
+
   initializeElements();
   setupEventListeners();
   init();
@@ -60,17 +60,17 @@ function init() {
 // Fetch and display channels
 async function fetchChannels() {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("No authentication token found");
       return [];
     }
-    
+
     const response = await fetch(CHANNELS_API_URL, {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
     const data = await response.json();
     if (data.success && data.channels) {
@@ -125,7 +125,7 @@ async function addChannel() {
     return;
   }
 
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (!token) {
     feedback.innerHTML =
       '<div class="error-message">Please login to add channels</div>';
@@ -142,7 +142,7 @@ async function addChannel() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ channelName: channelName }),
     });
@@ -173,16 +173,12 @@ async function addChannel() {
 
 // Delete a channel
 async function deleteChannel(channelName) {
-  if (!confirm(`Are you sure you want to stop tracking "${channelName}"?`)) {
-    return;
-  }
-
   const button = document.getElementById(`delete-${channelName}`);
   if (!button) return;
 
   const originalText = button.textContent;
 
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (!token) {
     alert("Please login to delete channels");
     return;
@@ -196,8 +192,8 @@ async function deleteChannel(channelName) {
     const response = await fetch(`${CHANNELS_API_URL}/${channelName}`, {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await response.json();
@@ -225,17 +221,17 @@ async function deleteChannel(channelName) {
 // Fetch and display messages
 async function fetchMessages() {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("No authentication token found");
       return;
     }
-    
+
     const response = await fetch(API_BASE_URL, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -246,12 +242,12 @@ async function fetchMessages() {
     const data = await response.json();
 
     if (data.success && data.data) {
-      console.log('DATA FROM API:', data.data);
-      console.log('TOTAL MESSAGES:', data.data.length);
+      console.log("DATA FROM API:", data.data);
+      console.log("TOTAL MESSAGES:", data.data.length);
       data.data.forEach((msg, index) => {
         console.log(`Message ${index + 1}:`, msg);
       });
-      
+
       displayMessages(data.data);
       displaySuspiciousUsers(data.data);
     } else {
@@ -351,25 +347,27 @@ function displayMessages(messages) {
           : messageScore < 0
           ? "negative"
           : "neutral";
-      
+
       // Get message date
-      const date = new Date(msg.timestamp || msg.createdAt).toLocaleDateString();
+      const date = new Date(
+        msg.timestamp || msg.createdAt
+      ).toLocaleDateString();
 
       return `
             <div class="message-row ${sentimentClass}">
                 <div class="message-user-info">
-                    <div class="message-channel">${channelName}</div>
+                   
                     <div class="message-username">${username}</div>
+                     
                 </div>
-                <div class="user-score ${scoreDisplay.class}">${
-        scoreDisplay.display
-      }</div>
+               
                 <div class="message-content">${
                   msg.message || "No message content"
                 }</div>
-                <div class="message-score ${messageScoreClass}">${messageScoreDisplay}</div>
+                <div class="message-channel">from the channel ${channelName}</div>
                 <div class="message-date">${date}</div>
                 <div class="message-time">${time}</div>
+                <div class="message-score ${messageScoreClass}">${messageScoreDisplay}</div>
             </div>
         `;
     })
@@ -453,8 +451,8 @@ function displaySuspiciousUsers(messages) {
             <div class="suspicious-user-item" onclick="toggleUserDropdown('${username}')">
                 <span class="suspicious-username">${username}</span>
                 <span class="suspicious-stats">
-                    <span class="suspicious-count">${messageCount} msgs</span>
-                    <span class="suspicious-score ${scoreDisplay.class}">${scoreDisplay.display}</span>
+                    <span class="suspicious-count">${messageCount} messages send</span>
+                    <span class="suspicious-score ${scoreDisplay.class}">Score of  ${scoreDisplay.display}</span>
                 </span>
                 <div class="user-dropdown" id="dropdown-${username}">
                     <div class="negative-messages">

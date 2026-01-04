@@ -385,7 +385,6 @@ function displayMessages(messages) {
 
 // Display users with negative average sentiment scores
 function displaySuspiciousUsers(messages) {
-  console.log("displaySuspiciousUsers called with messages:", messages?.length);
   if (!suspiciousUsersContainer) {
     console.error("suspiciousUsersContainer not found!");
     return;
@@ -406,15 +405,10 @@ function displaySuspiciousUsers(messages) {
     userMessageCounts[username] = (userMessageCounts[username] || 0) + 1;
   });
 
-  console.log("User averages:", userAverages);
-  console.log("User message counts:", userMessageCounts);
-
   // Filter users with negative average scores
   const negativeUsers = Object.entries(userAverages)
     .filter(([username, avgScore]) => avgScore < 0)
     .sort((a, b) => a[1] - b[1]); // Sort by most negative first
-
-  console.log("Negative users:", negativeUsers);
 
   if (negativeUsers.length === 0) {
     suspiciousUsersContainer.innerHTML =

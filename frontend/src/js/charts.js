@@ -396,6 +396,7 @@ function initChartsWhenReady() {
     });
   } else {
     // DOM is already loaded
+
     const charts = new AnalyticsCharts();
     // Store globally for updates
     window.analyticsCharts = charts;

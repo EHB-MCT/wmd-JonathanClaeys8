@@ -1,9 +1,3 @@
-// Initialize login page
-document.addEventListener("DOMContentLoaded", function () {
-  // Set active navigation link
-  setActiveNavLink();
-});
-
 // Login form handler
 async function handleLogin(event) {
   event.preventDefault();

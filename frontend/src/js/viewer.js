@@ -293,9 +293,6 @@ class GlobalAnalyticsCharts {
 
 // Initialize page
 document.addEventListener("DOMContentLoaded", function () {
-  // This is a public global analytics dashboard - no login required
-  // But we can still show user info if they're logged in
-
   // Check if user is logged in (optional)
   const userData = localStorage.getItem("userData");
   const authToken = localStorage.getItem("authToken");
@@ -310,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     // Show guest info
     const navbarUser = document.querySelector(".navbar-user");
-    navbarUser.innerHTML = '<span class="user-info">Guest User</span>';
+    navbarUser.innerHTML = '<span class="user-info"></span>';
   }
 
   // Initialize global analytics charts (always loads - no login required)

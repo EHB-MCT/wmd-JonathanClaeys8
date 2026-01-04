@@ -9,10 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 // Register endpoint
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+const { username, password } = req.body;
     
-    if (!username || !password || !role) {
-      return res.status(400).json({ error: 'All fields are required' });
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
     }
 
     if (password.length < 6) {
@@ -28,15 +28,17 @@ router.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
+const userRole = 'viewer';
+    
     const result = await db.collection('users').insertOne({
       username,
       password: hashedPassword,
-      role: role,
+      role: userRole,
       createdAt: new Date()
     });
 
     const token = jwt.sign(
-      { userId: result.insertedId, username, role: role },
+      { userId: result.insertedId, username, role: userRole },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -47,7 +49,7 @@ router.post('/register', async (req, res) => {
       user: {
         id: result.insertedId,
         username,
-        role: role
+        role: userRole
       }
     });
   } catch (error) {

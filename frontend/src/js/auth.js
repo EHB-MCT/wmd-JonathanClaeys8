@@ -1,4 +1,4 @@
-// Access control for moderator pages
+// Access control for moderator pages (now allows all authenticated users)
 function checkModeratorAccess() {
   const userData = localStorage.getItem("userData");
   const authToken = localStorage.getItem("authToken");
@@ -8,13 +8,7 @@ function checkModeratorAccess() {
     return;
   }
 
-  const user = JSON.parse(userData);
-  if (user.role !== "moderator") {
-    window.location.href = "viewer.html";
-    return;
-  }
-
-  return user;
+  return JSON.parse(userData);
 }
 
 // Access control for viewer pages

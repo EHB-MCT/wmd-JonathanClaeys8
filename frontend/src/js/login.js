@@ -42,13 +42,9 @@ async function handleLogin(event) {
         
         showFeedback('Login successful! Redirecting...', 'success');
         
-        // Redirect based on role
+// Redirect to viewer page
         setTimeout(() => {
-            if (data.user.role === 'moderator') {
-                window.location.href = 'index.html';
-            } else {
-                window.location.href = 'viewer.html';
-            }
+            window.location.href = 'viewer.html';
         }, 1500);
         
     } catch (error) {

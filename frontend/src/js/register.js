@@ -2,14 +2,13 @@
 async function handleRegistration(event) {
     event.preventDefault();
     
-    const username = document.getElementById('username').value.trim();
+const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
     const feedback = document.getElementById('register-feedback');
     const registerButton = document.getElementById('register-button');
     
-    // Validate inputs
-    if (!username || !password || !role) {
+// Validate inputs
+    if (!username || !password) {
         showFeedback('Please fill in all fields', 'error');
         return;
     }
@@ -30,10 +29,9 @@ async function handleRegistration(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
+body: JSON.stringify({
                 username,
-                password,
-                role
+                password
             })
         });
         
@@ -49,13 +47,9 @@ async function handleRegistration(event) {
         
         showFeedback('Registration successful! Redirecting...', 'success');
         
-        // Redirect based on role
+// Redirect to viewer page
         setTimeout(() => {
-            if (data.user.role === 'moderator') {
-                window.location.href = 'index.html';
-            } else {
-                window.location.href = 'viewer.html';
-            }
+            window.location.href = 'viewer.html';
         }, 1500);
         
     } catch (error) {

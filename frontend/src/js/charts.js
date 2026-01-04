@@ -26,19 +26,49 @@ class AnalyticsCharts {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      // Fetch all necessary data with authentication headers
+console.log('🔍 Loading chart data from:', apiBase);
+      console.log('🔍 Auth token present:', !!token);
+      
+      // Fetch all necessary data with authentication headers - use global endpoints to get real data
       const [sentimentResponse, scatterResponse, activityResponse] = await Promise.all([
-        fetch(`${apiBase}/sentiment-distribution`, { headers }).then(res => res.json()),
-        fetch(`${apiBase}/scatterplot`, { headers }).then(res => res.json()),
-        fetch(`${apiBase}/channel-activity`, { headers }).then(res => res.json())
+        fetch(`${apiBase}/sentiment-distribution?global=true`, { headers }).then(res => {
+          console.log('🔍 Sentiment response status:', res.status);
+          return res.json();
+        }),
+        fetch(`${apiBase}/scatterplot?global=true`, { headers }).then(res => {
+          console.log('🔍 Scatter response status:', res.status);
+          return res.json();
+        }),
+        fetch(`${apiBase}/channel-activity?global=true`, { headers }).then(res => {
+          console.log('🔍 Activity response status:', res.status);
+          return res.json();
+        })
       ]);
+
+      console.log('🔍 Raw responses:', {
+        sentiment: sentimentResponse,
+        scatter: scatterResponse,
+        activity: activityResponse
+      });
 
       // Extract data from response format
       this.sentimentData = sentimentResponse.success ? sentimentResponse.data : sentimentResponse;
       this.scatterData = scatterResponse.success ? scatterResponse.data : scatterResponse;
       this.channelActivityData = activityResponse.success ? activityResponse.data : activityResponse;
-    } catch (error) {
-      console.error('Error loading chart data:', error);
+      
+      console.log('🔍 Extracted data:', {
+        sentiment: this.sentimentData,
+        scatter: this.scatterData,
+        activity: this.channelActivityData
+      });
+      
+      // Validate that we have real data
+      if (!this.sentimentData || !this.scatterData || !this.channelActivityData) {
+        throw new Error('Missing data from API responses');
+      }
+} catch (error) {
+      console.error('🔥 Error loading chart data:', error);
+      console.log('🔥 Falling back to mock data');
       // Use mock data if API fails
       this.useMockData();
     }
@@ -75,11 +105,13 @@ class AnalyticsCharts {
     this.createUsersScoreChart();
   }
 
-  createSentimentChart() {
+createSentimentChart() {
     const ctx = document.getElementById('sentimentChart').getContext('2d');
     
     // Use real sentiment distribution data from Twitch chat messages
     const sentiments = this.sentimentData || { positive: 0, negative: 0, neutral: 0 };
+    
+    console.log('🎨 Creating sentiment chart with data:', sentiments);
 
     this.charts.sentiment = new Chart(ctx, {
       type: 'doughnut',
@@ -120,7 +152,7 @@ class AnalyticsCharts {
     });
   }
 
-  createChannelActivityChart() {
+createChannelActivityChart() {
     const ctx = document.getElementById('channelActivityChart').getContext('2d');
     
     let hours = [];
@@ -130,6 +162,7 @@ class AnalyticsCharts {
     if (this.channelActivityData && this.channelActivityData.length > 0) {
       hours = this.channelActivityData.map(item => item.hour);
       messageCounts = this.channelActivityData.map(item => item.count);
+      console.log('📈 Creating activity chart with real data:', { hours, messageCounts });
     } else {
       // Fallback to generated data
       const now = new Date();
@@ -204,12 +237,13 @@ class AnalyticsCharts {
 
 
 
-  createUsersScoreChart() {
+createUsersScoreChart() {
     const ctx = document.getElementById('usersScoreChart').getContext('2d');
     
     // Use real Twitch chat user data from scatter
     const userScores = [];
     if (this.scatterData && this.scatterData.length > 0) {
+      console.log('👥 Creating users chart with scatter data:', this.scatterData.length, 'users');
       this.scatterData.slice(0, 15).forEach(user => { // Top 15 users
         userScores.push({
           username: user.username,
@@ -300,11 +334,57 @@ class AnalyticsCharts {
     });
   }
 
-  updateCharts() {
+updateCharts() {
     // Method to refresh all charts with new data
-    Object.values(this.charts).forEach(chart => chart.destroy());
+    console.log('🔄 Updating charts with fresh data');
+    Object.values(this.charts).forEach(chart => {
+      if (chart && chart.destroy) {
+        chart.destroy();
+      }
+    });
     this.charts = {};
     this.loadData().then(() => this.createCharts());
+  }
+  
+  // Update individual chart data without full reload
+  updateChartData() {
+    console.log('🔄 Updating chart data only');
+    this.loadData().then(() => {
+      // Update sentiment chart
+      if (this.charts.sentiment && this.sentimentData) {
+        this.charts.sentiment.data.datasets[0].data = [this.sentimentData.positive, this.sentimentData.negative, this.sentimentData.neutral];
+        this.charts.sentiment.update('active');
+      }
+      
+      // Update activity chart
+      if (this.charts.channelActivity && this.channelActivityData) {
+        const hours = this.channelActivityData.map(item => item.hour);
+        const counts = this.channelActivityData.map(item => item.count);
+        this.charts.channelActivity.data.labels = hours;
+        this.charts.channelActivity.data.datasets[0].data = counts;
+        this.charts.channelActivity.update('active');
+      }
+      
+      // Update users chart
+      if (this.charts.usersScore && this.scatterData) {
+        const userScores = this.scatterData.slice(0, 15).map(user => ({
+          username: user.username,
+          score: user.avgSentiment || user.score,
+          activity: user.activityRate || user.activity,
+          messages: user.totalMessages || user.messages
+        }));
+        userScores.sort((a, b) => b.score - a.score);
+        
+        this.charts.usersScore.data.labels = userScores.map(user => user.username);
+        this.charts.usersScore.data.datasets[0].data = userScores.map(user => user.score);
+        this.charts.usersScore.data.datasets[0].backgroundColor = userScores.map(user => {
+          if (user.score > 0.1) return '#4caf50';
+          if (user.score < -0.1) return '#f44336';
+          return '#ff9800';
+        });
+        this.charts.usersScore.update('active');
+      }
+    });
   }
 }
 
@@ -321,12 +401,16 @@ function initChartsWhenReady() {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🔍 Charts.js: DOM loaded, creating AnalyticsCharts');
-      new AnalyticsCharts();
+      const charts = new AnalyticsCharts();
+      // Store globally for updates
+      window.analyticsCharts = charts;
     });
   } else {
     // DOM is already loaded
     console.log('🔍 Charts.js: DOM already loaded, creating AnalyticsCharts');
-    new AnalyticsCharts();
+    const charts = new AnalyticsCharts();
+    // Store globally for updates
+    window.analyticsCharts = charts;
   }
 }
 

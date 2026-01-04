@@ -51,11 +51,23 @@ function setupEventListeners() {
 function init() {
   fetchChannels();
   fetchMessages();
+  
+  // Update charts periodically
   setInterval(() => {
     fetchMessages();
     fetchChannels();
+    updateChartsIfExist();
   }, 5000);
 }
+
+// Update charts if they exist
+function updateChartsIfExist() {
+  if (window.analyticsCharts) {
+    window.analyticsCharts.updateChartData();
+  }
+}
+
+
 
 // Fetch and display channels
 async function fetchChannels() {
@@ -242,14 +254,14 @@ async function fetchMessages() {
     const data = await response.json();
 
     if (data.success && data.data) {
-      console.log("DATA FROM API:", data.data);
-      console.log("TOTAL MESSAGES:", data.data.length);
-      data.data.forEach((msg, index) => {
-        console.log(`Message ${index + 1}:`, msg);
-      });
-
+      console.log("📨 DATA FROM API:", data.data);
+      console.log("📊 TOTAL MESSAGES:", data.data.length);
+      
       displayMessages(data.data);
       displaySuspiciousUsers(data.data);
+      
+      // Trigger chart update when new messages arrive
+      updateChartsIfExist();
     } else {
       showError("Failed to load messages: Invalid response format");
     }

@@ -88,7 +88,7 @@ function displayChannelsList(channels) {
   if (!channelsList) return;
 
   if (channels.length === 0) {
-    channelsList.innerHTML = "<p>No channels being tracked. Add one below!</p>";
+    channelsList.innerHTML = "<p>No channels being tracked.</p>";
     return;
   }
 

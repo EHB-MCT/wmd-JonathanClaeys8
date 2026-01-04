@@ -459,10 +459,11 @@ function displaySuspiciousUsers(messages) {
                         <h4>Negative Messages</h4>
                         ${negativeMessagesHTML}
                     </div>
-                    <div class="dropdown-buttons">
+<div class="dropdown-buttons">
                         <button class="dropdown-btn ban-btn" onclick="event.stopPropagation(); banUser('${username}')">Ban</button>
                         <button class="dropdown-btn timeout-btn" onclick="event.stopPropagation(); timeoutUser('${username}')">Time-out</button>
                         <button class="dropdown-btn warning-btn" onclick="event.stopPropagation(); warnUser('${username}')">Warning</button>
+                        <button class="dropdown-btn remove-btn" onclick="event.stopPropagation(); removeUser('${username}')">Remove</button>
                     </div>
                 </div>
             </div>
@@ -523,6 +524,39 @@ function warnUser(username) {
   alert(`Send warning to: ${username}`);
 }
 
+function removeUser(username) {
+  if (confirm(`Are you sure you want to remove ${username} from the suspicious users list?`)) {
+    // Filter out the user from the current messages display
+    const messagesContainer = document.getElementById('messages-container');
+    const messageRows = messagesContainer.querySelectorAll('.message-row');
+    
+    messageRows.forEach(row => {
+      const usernameElement = row.querySelector('.message-username');
+      if (usernameElement && usernameElement.textContent === username) {
+        row.style.display = 'none';
+      }
+    });
+    
+    // Remove the user from suspicious users list
+    const suspiciousUserItems = document.querySelectorAll('.suspicious-user-item');
+    suspiciousUserItems.forEach(item => {
+      const usernameElement = item.querySelector('.suspicious-username');
+      if (usernameElement && usernameElement.textContent === username) {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Show success feedback
+    const feedback = document.getElementById('add-channel-feedback');
+    if (feedback) {
+      feedback.innerHTML = `<div class="success-message">User ${username} removed from list</div>`;
+      setTimeout(() => {
+        feedback.innerHTML = '';
+      }, 3000);
+    }
+  }
+}
+
 // Export functions for global access (needed for onclick handlers)
 window.addChannel = addChannel;
 window.deleteChannel = deleteChannel;
@@ -530,3 +564,4 @@ window.toggleUserDropdown = toggleUserDropdown;
 window.banUser = banUser;
 window.timeoutUser = timeoutUser;
 window.warnUser = warnUser;
+window.removeUser = removeUser;

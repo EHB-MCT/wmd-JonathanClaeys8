@@ -412,6 +412,15 @@ body {
   background-color: #5ba5a9;
 }
 
+.remove-btn {
+  background-color: #023061;
+  color: white;
+}
+
+.remove-btn:hover {
+  background-color: #04468b;
+}
+
 .negative-messages {
   max-height: 200px;
   overflow-y: auto;

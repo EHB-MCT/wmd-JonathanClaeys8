@@ -51,7 +51,7 @@ function setupEventListeners() {
 function init() {
   fetchChannels();
   fetchMessages();
-  
+
   // Update charts periodically
   setInterval(() => {
     fetchMessages();
@@ -66,8 +66,6 @@ function updateChartsIfExist() {
     window.analyticsCharts.updateChartData();
   }
 }
-
-
 
 // Fetch and display channels
 async function fetchChannels() {
@@ -254,12 +252,9 @@ async function fetchMessages() {
     const data = await response.json();
 
     if (data.success && data.data) {
-      console.log("📨 DATA FROM API:", data.data);
-      console.log("📊 TOTAL MESSAGES:", data.data.length);
-      
       displayMessages(data.data);
       displaySuspiciousUsers(data.data);
-      
+
       // Trigger chart update when new messages arrive
       updateChartsIfExist();
     } else {
@@ -537,33 +532,39 @@ function warnUser(username) {
 }
 
 function removeUser(username) {
-  if (confirm(`Are you sure you want to remove ${username} from the suspicious users list?`)) {
+  if (
+    confirm(
+      `Are you sure you want to remove ${username} from the suspicious users list?`
+    )
+  ) {
     // Filter out the user from the current messages display
-    const messagesContainer = document.getElementById('messages-container');
-    const messageRows = messagesContainer.querySelectorAll('.message-row');
-    
-    messageRows.forEach(row => {
-      const usernameElement = row.querySelector('.message-username');
+    const messagesContainer = document.getElementById("messages-container");
+    const messageRows = messagesContainer.querySelectorAll(".message-row");
+
+    messageRows.forEach((row) => {
+      const usernameElement = row.querySelector(".message-username");
       if (usernameElement && usernameElement.textContent === username) {
-        row.style.display = 'none';
+        row.style.display = "none";
       }
     });
-    
+
     // Remove the user from suspicious users list
-    const suspiciousUserItems = document.querySelectorAll('.suspicious-user-item');
-    suspiciousUserItems.forEach(item => {
-      const usernameElement = item.querySelector('.suspicious-username');
+    const suspiciousUserItems = document.querySelectorAll(
+      ".suspicious-user-item"
+    );
+    suspiciousUserItems.forEach((item) => {
+      const usernameElement = item.querySelector(".suspicious-username");
       if (usernameElement && usernameElement.textContent === username) {
-        item.style.display = 'none';
+        item.style.display = "none";
       }
     });
-    
+
     // Show success feedback
-    const feedback = document.getElementById('add-channel-feedback');
+    const feedback = document.getElementById("add-channel-feedback");
     if (feedback) {
       feedback.innerHTML = `<div class="success-message">User ${username} removed from list</div>`;
       setTimeout(() => {
-        feedback.innerHTML = '';
+        feedback.innerHTML = "";
       }, 3000);
     }
   }

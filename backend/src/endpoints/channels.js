@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDb } = require("../mongo-connection");
+const { getDb } = require("../database/mongo-connection");
 const { authenticateToken } = require("../middleware/auth");
 const fs = require('fs');
 const path = require('path');

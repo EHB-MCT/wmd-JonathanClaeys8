@@ -1,4 +1,4 @@
-const { connectToMongo, getDb } = require('./src/mongo-connection');
+const { connectToMongo, getDb } = require('../database/mongo-connection');
 
 // Clear old messages for users who should only see messages from their registration time
 async function cleanupOldMessages() {

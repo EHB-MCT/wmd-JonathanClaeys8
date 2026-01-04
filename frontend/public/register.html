@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Chat Moderation</title>
-    <link rel="stylesheet" href="src/css/styles.css?v=2.2" />
+    <title>Register - Chat Moderation</title>
+    <link rel="stylesheet" href="../src/css/styles.css?v=2.2" />
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -24,8 +24,8 @@
     
     <div class="register-container">
       <div class="register-form">
-        <h1>Login to Account</h1>
-        <form id="login-form" onsubmit="handleLogin(event)">
+        <h1>Register Account</h1>
+        <form id="registration-form" onsubmit="handleRegistration(event)">
           <div class="form-group">
             <label for="username">Username</label>
             <input 
@@ -49,23 +49,25 @@
             />
           </div>
           
-          <div class="form-group">
-            <button type="submit" class="register-btn" id="login-button">
-              Login
+
+          
+<div class="form-group">
+            <button type="submit" class="register-btn" id="register-button">
+              Register
             </button>
           </div>
           
           <div class="form-group">
-            <p>No account yet? <a href="register.html">Register</a></p>
+            <p>Already have an account? <a href="login.html">Login</a></p>
           </div>
           
-          <div id="login-feedback"></div>
+          <div id="register-feedback"></div>
         </form>
       </div>
     </div>
     
-<script src="src/js/auth.js?v=2.2"></script>
-    <script src="src/js/login-page.js?v=2.2"></script>
-    <script src="src/js/login.js?v=2.2"></script>
+<script src="../src/js/auth.js?v=2.2"></script>
+    <script src="../src/js/register-page.js?v=2.2"></script>
+    <script src="../src/js/register.js?v=2.2"></script>
   </body>
 </html>

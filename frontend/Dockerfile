@@ -7,7 +7,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/
 
 # Copy the frontend files
-COPY . /usr/share/nginx/html/
+COPY public/ /usr/share/nginx/html/
 
 # Expose port 80
 EXPOSE 80

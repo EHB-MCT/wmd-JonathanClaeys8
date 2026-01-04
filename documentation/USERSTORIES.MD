@@ -12,4 +12,4 @@
 - The user can register, he can select if he is a viewer or a moderator.
 - When a user is registered, if he logs out, he can log-in again with his credentials
 - The user can navigate from page to page as a moderator to : viewers, login page.
-- The user can hover his email to logout.
+- The user can logout and see his username in the navigation bar.

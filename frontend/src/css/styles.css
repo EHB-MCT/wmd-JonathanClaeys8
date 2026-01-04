@@ -60,6 +60,18 @@ body {
   color: #ffffff;
 }
 
+.user-info-nav .nav-link {
+  cursor: default;
+  background-color: #001d3d;
+  color: #d9d9d9;
+  font-weight: 600;
+}
+
+.user-info-nav .nav-link:hover {
+  background-color: #001d3d;
+  color: #d9d9d9;
+}
+
 .navbar-user {
   display: flex;
   flex-direction: column;
@@ -74,7 +86,7 @@ body {
 
 .navbar-user .logout-btn {
   background-color: #d9d9d9;
-  margin-top: 2px;
+  margin-top: 0px;
   color: #3c6e71;
   border: none;
   padding: 10px 30px;

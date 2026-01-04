@@ -34,12 +34,38 @@ function logout() {
 // Display user info in navbar
 function displayUserInfo() {
   const userData = localStorage.getItem("userData");
+  const navbarMenu = document.querySelector('.navbar-menu');
   const navbarUser = document.querySelector('.navbar-user');
   
-  if (userData && navbarUser) {
+  if (userData && navbarMenu) {
     const user = JSON.parse(userData);
     
-    // Clear existing content
+    // Remove existing user info nav item if present
+    const existingUserInfo = document.querySelector('.user-info-nav');
+    if (existingUserInfo) {
+      existingUserInfo.remove();
+    }
+    
+    // Add username as a nav item
+    const userInfoLi = document.createElement('li');
+    userInfoLi.className = 'nav-item user-info-nav';
+    
+    const userInfoLink = document.createElement('span');
+    userInfoLink.className = 'nav-link user-info';
+    userInfoLink.textContent = user.username;
+    
+    userInfoLi.appendChild(userInfoLink);
+    navbarMenu.appendChild(userInfoLi);
+  } else {
+    // Remove existing user info nav item if not logged in
+    const existingUserInfo = document.querySelector('.user-info-nav');
+    if (existingUserInfo) {
+      existingUserInfo.remove();
+    }
+  }
+  
+  // Handle logout button in navbar-user section
+  if (userData && navbarUser) {
     navbarUser.innerHTML = '';
     
     // Add logout button

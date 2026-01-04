@@ -38,3 +38,9 @@ We welcome creative ideas aligned with our project’s vision.
    ```bash
    git clone https://github.com/JonathanClaeys/Title
    ```
+
+2. **Project Structure**
+   - **index.html** - Main viewer page with global analytics dashboard
+   - **moderation.html** - Moderation page with user management and channel controls
+   - **login.html** - User authentication page
+   - **register.html** - New user registration page

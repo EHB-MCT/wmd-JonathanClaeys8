@@ -42,9 +42,9 @@ async function handleLogin(event) {
         
         showFeedback('Login successful! Redirecting...', 'success');
         
-// Redirect to viewer page
+// Redirect to viewer page (now index.html)
         setTimeout(() => {
-            window.location.href = 'viewer.html';
+            window.location.href = 'index.html';
         }, 1500);
         
     } catch (error) {

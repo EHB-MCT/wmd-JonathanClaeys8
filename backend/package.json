@@ -1,0 +1,26 @@
+{
+  "name": "wmd-jonathanclaeys8",
+  "version": "1.0.0",
+  "description": "",
+"main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "start-all": "concurrently \"node src/server.js\" \"node src/services/twitch-listener.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.5.1",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^6.10.0",
+    "nodemon": "^3.1.11",
+    "sentiment": "^5.0.2",
+    "tmi.js": "^1.8.5"
+  }
+}

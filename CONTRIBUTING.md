@@ -35,9 +35,6 @@ We welcome creative ideas aligned with our project’s vision.
 ## Setting Up the Environment & Testing
 
 1. **Clone the repository**
-   ```bash
-   git clone https://github.com/JonathanClaeys/Title
-   ```
 
 2. **Project Structure**
    - **index.html** - Main viewer page with global analytics dashboard
